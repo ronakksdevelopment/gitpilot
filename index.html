@@ -3,10 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GitPilot — Your GitHub Workflow, Ready for Takeoff</title>
+<title>GitPilot: Your GitHub Workflow, Ready for Takeoff</title>
 <link rel="icon" id="faviconLink" href="">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tweetnacl/1.0.3/nacl.min.js" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tweetnacl-util/0.15.1/nacl-util.min.js" referrerpolicy="no-referrer"></script>
 <style>
 :root{
   --near-black:#15121a;
@@ -177,18 +179,20 @@ button{font-family:inherit;}
 .grid{display:grid;gap:16px;}
 .grid-2{grid-template-columns:repeat(2,1fr);}
 .grid-3{grid-template-columns:repeat(3,1fr);}
-.grid-4{grid-template-columns:repeat(4,1fr);}
+.grid-4{grid-template-columns:repeat(4,1fr);grid-auto-rows:1fr;align-items:stretch;}
+.grid-4 > .card{margin-top:0;}
 @media(max-width:900px){.grid-4{grid-template-columns:repeat(2,1fr);}.grid-3{grid-template-columns:repeat(2,1fr);}.grid-2{grid-template-columns:1fr;}}
 @media(max-width:560px){.grid-4{grid-template-columns:1fr;}.grid-3{grid-template-columns:1fr;}}
 
-.stat-card{display:flex;flex-direction:column;gap:6px;}
+.stat-card{display:flex;flex-direction:column;gap:6px;width:100%;height:100%;min-height:128px;box-sizing:border-box;justify-content:flex-start;}
 .stat-card .stat-icon{
-  width:36px;height:36px;border-radius:10px;
+  width:36px;height:36px;flex:0 0 36px;border-radius:10px;
   display:flex;align-items:center;justify-content:center;
   background:var(--lavender-soft);color:var(--violet-deep);font-size:1rem;margin-bottom:4px;
 }
-.stat-card .stat-value{font-size:1.5rem;font-weight:700;}
+.stat-card .stat-value{font-size:1.5rem;font-weight:700;line-height:1.2;color:var(--text);}
 .stat-card .stat-label{color:var(--text-muted);font-size:.82rem;}
+.grid-4 > .stat-card{display:flex;}
 
 h2.section-title{font-size:1.05rem;margin:26px 0 12px 0;display:flex;align-items:center;gap:8px;}
 h2.section-title i{color:var(--violet);}
@@ -412,7 +416,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       <img src="" alt="GitPilot logo" class="gitpilot-logo-img">
       <div class="brand-text">
         <strong>GitPilot</strong>
-        <span class="beta-badge">BETA v0.5.0</span>
+        <span class="beta-badge">BETA v0.7.0</span>
       </div>
     </div>
     <div class="nav" role="tablist" aria-orientation="vertical">
@@ -420,6 +424,10 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       <button class="nav-item" data-page="repositories" role="tab" aria-selected="false"><i class="fa-solid fa-code-branch"></i> Repositories</button>
       <button class="nav-item" data-page="create" role="tab" aria-selected="false"><i class="fa-solid fa-plus"></i> Create Repository</button>
       <button class="nav-item" data-page="upload" role="tab" aria-selected="false"><i class="fa-solid fa-upload"></i> Upload Files</button>
+      <button class="nav-item" data-page="prissues" role="tab" aria-selected="false"><i class="fa-solid fa-code-pull-request"></i> PRs &amp; Issues</button>
+      <button class="nav-item" data-page="actions" role="tab" aria-selected="false"><i class="fa-solid fa-gears"></i> Actions</button>
+      <button class="nav-item" data-page="secrets" role="tab" aria-selected="false"><i class="fa-solid fa-key"></i> Secrets &amp; Pages</button>
+      <button class="nav-item" data-page="security" role="tab" aria-selected="false"><i class="fa-solid fa-shield-halved"></i> Security</button>
       <button class="nav-item" data-page="activity" role="tab" aria-selected="false"><i class="fa-solid fa-clock-rotate-left"></i> Activity</button>
       <button class="nav-item" data-page="settings" role="tab" aria-selected="false"><i class="fa-solid fa-gear"></i> Settings</button>
       <button class="nav-item" data-page="changelog" role="tab" aria-selected="false"><i class="fa-solid fa-list-check"></i> Changelog</button>
@@ -430,7 +438,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
         <span class="dot off" id="connDot"></span>
         <span id="connLabel">Not connected</span>
       </div>
-      <span>&copy; 2026 GitPilot — Community Project</span>
+      <span>&copy; 2026 GitPilot - Community Project</span>
     </div>
   </nav>
 
@@ -471,11 +479,11 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
               <input type="password" id="patInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
               <button class="toggle-visibility" id="togglePatBtn" type="button" aria-label="Show token"><i class="fa-solid fa-eye"></i></button>
             </div>
-            <p class="hint">Needs <code>repo</code> scope for private repos, or <code>public_repo</code> for public-only access. <a href="https://github.com/settings/tokens" target="_blank" rel="noopener">Create a token on GitHub &rarr;</a></p>
+            <p class="hint">Use a <strong>fine-grained personal access token</strong> with repo access, plus the permissions for any features you want (Actions, Pull requests, Issues, Secrets, Pages, Security events, Administration, etc). <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">Create a token on GitHub &rarr;</a></p>
           </div>
           <div class="checkbox-row" style="margin-bottom:14px;">
             <input type="checkbox" id="persistTokenCheck">
-            <label for="persistTokenCheck" style="margin:0;font-weight:500;">Remember this token in this browser (localStorage). <span style="color:var(--danger);">Not recommended on shared devices — stored in plain text.</span></label>
+            <label for="persistTokenCheck" style="margin:0;font-weight:500;">Remember this token in this browser (localStorage). <span style="color:var(--danger);">Not recommended on shared devices (stored in plain text).</span></label>
           </div>
           <button class="btn btn-primary" id="connectBtn"><i class="fa-solid fa-plug"></i> Connect to GitHub</button>
           <span id="connectStatus" class="muted" style="margin-left:10px;font-size:.82rem;"></span>
@@ -484,10 +492,10 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
 
       <h2 class="section-title"><i class="fa-solid fa-chart-simple"></i> Repository Statistics</h2>
       <div class="grid grid-4">
-        <div class="card stat-card"><div class="stat-icon"><i class="fa-solid fa-code-branch"></i></div><div class="stat-value" id="statTotal">—</div><div class="stat-label">Total Repositories</div></div>
-        <div class="card stat-card"><div class="stat-icon"><i class="fa-solid fa-lock-open"></i></div><div class="stat-value" id="statPublic">—</div><div class="stat-label">Public</div></div>
-        <div class="card stat-card"><div class="stat-icon"><i class="fa-solid fa-lock"></i></div><div class="stat-value" id="statPrivate">—</div><div class="stat-label">Private</div></div>
-        <div class="card stat-card"><div class="stat-icon"><i class="fa-solid fa-star"></i></div><div class="stat-value" id="statStars">—</div><div class="stat-label">Total Stars</div></div>
+        <div class="card stat-card"><div class="stat-icon"><i class="fa-solid fa-code-branch"></i></div><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total Repositories</div></div>
+        <div class="card stat-card"><div class="stat-icon"><i class="fa-solid fa-lock-open"></i></div><div class="stat-value" id="statPublic">0</div><div class="stat-label">Public</div></div>
+        <div class="card stat-card"><div class="stat-icon"><i class="fa-solid fa-lock"></i></div><div class="stat-value" id="statPrivate">0</div><div class="stat-label">Private</div></div>
+        <div class="card stat-card"><div class="stat-icon"><i class="fa-solid fa-star"></i></div><div class="stat-value" id="statStars">0</div><div class="stat-label">Total Stars</div></div>
       </div>
 
       <h2 class="section-title"><i class="fa-solid fa-clock"></i> Recently Updated Repositories</h2>
@@ -582,7 +590,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
           </div>
           <div class="field">
             <label for="uploadBranchSelect">Branch</label>
-            <select id="uploadBranchSelect"><option value="">—</option></select>
+            <select id="uploadBranchSelect"><option value="">-</option></select>
           </div>
         </div>
         <div class="field">
@@ -602,6 +610,170 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
         <button class="btn btn-primary btn-block" id="uploadBtn" disabled><i class="fa-solid fa-paper-plane"></i> Publish to GitHub</button>
         <div class="progress-bar" id="uploadProgressBar" style="display:none;"><div class="progress-fill" id="uploadProgressFill"></div></div>
         <p class="hint" id="uploadStatus"></p>
+      </div>
+    </section>
+
+    <!-- ============ PRS & ISSUES ============ -->
+    <section class="page" id="page-prissues">
+      <div class="page-header">
+        <div>
+          <h1><i class="fa-solid fa-code-pull-request" style="color:var(--violet)"></i> Pull Requests &amp; Issues</h1>
+          <p class="sub">Browse, create and manage PRs and issues across your repos.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" id="piRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+      </div>
+      <div class="card">
+        <div class="grid grid-2">
+          <div class="field">
+            <label for="piRepoSelect">Repository</label>
+            <select id="piRepoSelect"><option value="">Connect to GitHub first…</option></select>
+          </div>
+          <div class="field">
+            <label for="piTypeSelect">Show</label>
+            <select id="piTypeSelect">
+              <option value="pulls">Pull Requests</option>
+              <option value="issues">Issues</option>
+            </select>
+          </div>
+        </div>
+        <div class="toolbar">
+          <select id="piStateSelect">
+            <option value="open">Open</option>
+            <option value="closed">Closed</option>
+            <option value="all">All</option>
+          </select>
+        </div>
+        <div id="piList"><div class="empty-state"><i class="fa-solid fa-code-pull-request"></i><span>Select a repository to view its pull requests or issues.</span></div></div>
+      </div>
+
+      <h2 class="section-title"><i class="fa-solid fa-plus"></i> New</h2>
+      <div class="card" style="max-width:640px;">
+        <div class="field">
+          <label for="piNewTitle">Title</label>
+          <input type="text" id="piNewTitle" placeholder="Short summary">
+        </div>
+        <div class="grid grid-2" id="piPrBranchRow">
+          <div class="field">
+            <label for="piNewHead">Head branch (compare)</label>
+            <input type="text" id="piNewHead" placeholder="feature-branch">
+          </div>
+          <div class="field">
+            <label for="piNewBase">Base branch</label>
+            <input type="text" id="piNewBase" placeholder="main">
+          </div>
+        </div>
+        <div class="field">
+          <label for="piNewBody">Description</label>
+          <textarea id="piNewBody" rows="4" placeholder="Details (optional)"></textarea>
+        </div>
+        <button class="btn btn-primary" id="piCreateBtn"><i class="fa-solid fa-plus"></i> Create</button>
+        <p class="hint" id="piCreateStatus"></p>
+      </div>
+    </section>
+
+    <!-- ============ ACTIONS / WORKFLOWS ============ -->
+    <section class="page" id="page-actions">
+      <div class="page-header">
+        <div>
+          <h1><i class="fa-solid fa-gears" style="color:var(--violet)"></i> Actions</h1>
+          <p class="sub">View workflows, trigger runs and manage Actions variables.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" id="actRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+      </div>
+      <div class="card">
+        <div class="field" style="max-width:420px;">
+          <label for="actRepoSelect">Repository</label>
+          <select id="actRepoSelect"><option value="">Connect to GitHub first…</option></select>
+        </div>
+      </div>
+
+      <h2 class="section-title"><i class="fa-solid fa-diagram-project"></i> Workflows</h2>
+      <div class="card">
+        <div id="actWorkflowList"><div class="empty-state"><i class="fa-solid fa-gears"></i><span>Select a repository to view its workflows.</span></div></div>
+      </div>
+
+      <h2 class="section-title"><i class="fa-solid fa-list"></i> Recent Runs</h2>
+      <div class="card">
+        <div id="actRunsList"><div class="empty-state"><i class="fa-solid fa-list"></i><span>No runs to show yet.</span></div></div>
+      </div>
+
+      <h2 class="section-title"><i class="fa-solid fa-sliders"></i> Repository Variables</h2>
+      <div class="card">
+        <div class="grid grid-2" style="align-items:end;">
+          <div class="field"><label for="actVarName">Name</label><input type="text" id="actVarName" placeholder="MY_VARIABLE"></div>
+          <div class="field"><label for="actVarValue">Value</label><input type="text" id="actVarValue" placeholder="value"></div>
+        </div>
+        <button class="btn btn-primary btn-sm" id="actVarSaveBtn"><i class="fa-solid fa-floppy-disk"></i> Create / Update Variable</button>
+        <p class="hint" id="actVarStatus"></p>
+        <hr class="divider">
+        <div id="actVarList"><div class="empty-state"><i class="fa-solid fa-sliders"></i><span>No variables loaded yet.</span></div></div>
+      </div>
+    </section>
+
+    <!-- ============ SECRETS & PAGES ============ -->
+    <section class="page" id="page-secrets">
+      <div class="page-header">
+        <div>
+          <h1><i class="fa-solid fa-key" style="color:var(--violet)"></i> Secrets &amp; Pages</h1>
+          <p class="sub">Manage Actions secrets and GitHub Pages for a repository.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="field" style="max-width:420px;">
+          <label for="secRepoSelect">Repository</label>
+          <select id="secRepoSelect"><option value="">Connect to GitHub first…</option></select>
+        </div>
+      </div>
+
+      <h2 class="section-title"><i class="fa-solid fa-lock"></i> Actions Secrets</h2>
+      <div class="card">
+        <p class="hint mt-0">Secret values are write-only: GitHub never returns them once saved, and GitPilot encrypts them client-side with the repo's public key before sending.</p>
+        <div class="grid grid-2" style="align-items:end;">
+          <div class="field"><label for="secName">Name</label><input type="text" id="secName" placeholder="MY_SECRET"></div>
+          <div class="field"><label for="secValue">Value</label><input type="password" id="secValue" placeholder="secret value"></div>
+        </div>
+        <button class="btn btn-primary btn-sm" id="secSaveBtn"><i class="fa-solid fa-floppy-disk"></i> Create / Update Secret</button>
+        <p class="hint" id="secStatus"></p>
+        <hr class="divider">
+        <div id="secList"><div class="empty-state"><i class="fa-solid fa-lock"></i><span>Select a repository to view its secrets.</span></div></div>
+      </div>
+
+      <h2 class="section-title"><i class="fa-brands fa-github"></i> GitHub Pages</h2>
+      <div class="card">
+        <div id="pagesStatusBox" class="hint mt-0">Select a repository to view its Pages configuration.</div>
+        <div class="grid grid-2" style="margin-top:10px;">
+          <div class="field"><label for="pagesBranch">Branch</label><input type="text" id="pagesBranch" placeholder="main"></div>
+          <div class="field"><label for="pagesPath">Path</label><select id="pagesPath"><option value="/">/ (root)</option><option value="/docs">/docs</option></select></div>
+        </div>
+        <button class="btn btn-primary btn-sm" id="pagesEnableBtn"><i class="fa-solid fa-rocket"></i> Enable / Update Pages</button>
+        <p class="hint" id="pagesStatus"></p>
+      </div>
+    </section>
+
+    <!-- ============ SECURITY ============ -->
+    <section class="page" id="page-security">
+      <div class="page-header">
+        <div>
+          <h1><i class="fa-solid fa-shield-halved" style="color:var(--violet)"></i> Security</h1>
+          <p class="sub">Dependabot and secret scanning alerts for a repository.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" id="secAlertRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+      </div>
+      <div class="card">
+        <div class="field" style="max-width:420px;">
+          <label for="secAlertRepoSelect">Repository</label>
+          <select id="secAlertRepoSelect"><option value="">Connect to GitHub first…</option></select>
+        </div>
+      </div>
+
+      <h2 class="section-title"><i class="fa-solid fa-bug"></i> Dependabot Alerts</h2>
+      <div class="card">
+        <div id="dependabotList"><div class="empty-state"><i class="fa-solid fa-bug"></i><span>Select a repository to view Dependabot alerts.</span></div></div>
+      </div>
+
+      <h2 class="section-title"><i class="fa-solid fa-key"></i> Secret Scanning Alerts</h2>
+      <div class="card">
+        <div id="secretScanList"><div class="empty-state"><i class="fa-solid fa-key"></i><span>Select a repository to view secret scanning alerts.</span></div></div>
       </div>
     </section>
 
@@ -657,7 +829,27 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
       <div class="card">
         <div class="changelog-entry">
-          <h4>v0.5.0 — Initial Beta Release <span class="badge badge-warning">Beta</span></h4>
+          <h4>v0.7.0: UI Consistency Pass <span class="badge badge-warning">Beta</span></h4>
+          <p class="muted" style="margin:0;font-size:.82rem;">Cleaned up wording and tightened layout consistency.</p>
+          <ul>
+            <li>Removed em dashes from all UI copy in favor of plain punctuation</li>
+            <li>Synced the version badge across the sidebar and About page with the latest changelog entry</li>
+            <li>All 4 Dashboard stat boxes (Total, Public, Private, Stars) now share identical size and alignment via equal-height grid rows</li>
+            <li>Confirmed all colors are theme-driven (light/dark/system) with no stray hardcoded values</li>
+          </ul>
+        </div>
+        <div class="changelog-entry">
+          <h4>v0.6.0: Fine-Grained Token Support <span class="badge badge-warning">Beta</span></h4>
+          <p class="muted" style="margin:0;font-size:.82rem;">Expanded support for fine-grained PAT permissions.</p>
+          <ul>
+            <li>Pull Requests &amp; Issues: browse, create, close and merge</li>
+            <li>Actions: view workflows, trigger runs (workflow_dispatch), view recent run status, manage repository variables</li>
+            <li>Secrets &amp; Pages: create/update/delete Actions secrets (client-side libsodium sealed-box encryption), enable/configure GitHub Pages</li>
+            <li>Security: view and dismiss/resolve Dependabot and secret scanning alerts</li>
+          </ul>
+        </div>
+        <div class="changelog-entry">
+          <h4>v0.5.0: Initial Beta Release <span class="badge badge-warning">Beta</span></h4>
           <p class="muted" style="margin:0;font-size:.82rem;">First public beta of GitPilot.</p>
           <ul>
             <li>Connect to GitHub via Personal Access Token with live validation</li>
@@ -681,9 +873,9 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
       <div class="card">
         <img src="" alt="GitPilot logo" class="gitpilot-logo-img about-logo">
-        <h2 style="margin:0 0 6px 0;">GitPilot <span class="beta-badge">BETA v0.5.0</span></h2>
+        <h2 style="margin:0 0 6px 0;">GitPilot <span class="beta-badge">BETA v0.7.0</span></h2>
         <p class="muted">GitPilot is an <strong>independent, open-source, community-driven companion</strong> for working with GitHub repositories. It is not an official GitHub product and is not affiliated with or endorsed by GitHub, Inc. or Microsoft Corporation.</p>
-        <p class="muted">GitPilot talks directly to the official GitHub REST API from your browser — your token stays with you, and no backend ever sees it.</p>
+        <p class="muted">GitPilot talks directly to the official GitHub REST API from your browser. Your token stays with you, and no backend ever sees it.</p>
         <div class="link-row">
           <a class="btn btn-sm" id="aboutProjectLink" href="#" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> Project repository</a>
           <a class="btn btn-sm" id="aboutIssuesLink" href="#" target="_blank" rel="noopener"><i class="fa-solid fa-bug"></i> Report an issue</a>
@@ -695,7 +887,8 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
         <h2 class="section-title mt-0"><i class="fa-solid fa-scale-balanced"></i> Terms &amp; Disclaimers</h2>
         <ul style="color:var(--text-muted);font-size:.86rem;line-height:1.7;padding-left:18px;">
           <li><strong>Token security:</strong> your Personal Access Token is sent only to the official GitHub API over HTTPS. By default it is kept in memory only and cleared when you close or reload the tab; you may opt in to local storage persistence at your own risk.</li>
-          <li><strong>Permissions:</strong> only grant the minimum scopes your use case requires, and revoke tokens you no longer use from your GitHub settings.</li>
+          <li><strong>Permissions:</strong> only grant the minimum scopes your use case requires, and revoke tokens you no longer use from your GitHub settings. GitPilot's extra tabs (Actions, PRs &amp; Issues, Secrets &amp; Pages, Security) only work if your token includes the matching fine-grained permission. If a permission is missing you'll see a "Not found / lack permission" error from GitHub for that feature only.</li>
+          <li><strong>Never-expiring, all-repo tokens:</strong> a token with no expiration and access to every repository is a bigger risk if it ever leaks. Prefer an expiring token scoped only to the repositories you intend to manage here.</li>
           <li><strong>User responsibility:</strong> you are solely responsible for actions performed with your token, including repository creation, uploads and deletions.</li>
           <li><strong>GitHub API limitations:</strong> GitPilot is subject to GitHub's API rate limits, outages and policy changes, which are outside this project's control.</li>
           <li><strong>Beta software:</strong> this is an early beta. Expect rough edges. Review destructive actions carefully before confirming them.</li>
@@ -737,9 +930,9 @@ const STORAGE_TOKEN_KEY = "gitpilot_token";
 const STORAGE_PERSIST_KEY = "gitpilot_persist_token";
 const STORAGE_THEME_KEY = "gitpilot_theme";
 const STORAGE_ACTIVITY_KEY = "gitpilot_activity";
-const PROJECT_URL = "https://github.com/gitpilot/gitpilot";
-const ISSUES_URL = "https://github.com/gitpilot/gitpilot/issues";
-const CONTRIB_URL = "https://github.com/gitpilot/gitpilot/blob/main/CONTRIBUTING.md";
+const PROJECT_URL = "https://github.com/ronakksdevelopment/gitpilot";
+const ISSUES_URL = "https://github.com/ronakksdevelopment/gitpilot/issues";
+const CONTRIB_URL = "https://github.com/ronakksdevelopment/gitpilot/blob/main/CONTRIBUTING.md";
 
 let state = {
   token: null,
@@ -850,6 +1043,21 @@ function gotoPage(pageId){
   window.scrollTo(0,0);
   if(pageId === "repositories" && state.token && !state.reposLoaded) fetchRepos();
   if(pageId === "upload") populateUploadRepoSelect();
+  if(pageId === "prissues") populateRepoSelect($("#piRepoSelect"));
+  if(pageId === "actions") populateRepoSelect($("#actRepoSelect"));
+  if(pageId === "secrets") populateRepoSelect($("#secRepoSelect"));
+  if(pageId === "security") populateRepoSelect($("#secAlertRepoSelect"));
+}
+function populateRepoSelect(sel){
+  if(!sel) return;
+  const current = sel.value;
+  if(!state.token || !state.repos.length){
+    sel.innerHTML = '<option value="">' + (state.token ? "No repositories available" : "Connect to GitHub first…") + '</option>';
+    return;
+  }
+  sel.innerHTML = '<option value="">Select a repository…</option>' +
+    state.repos.map(r => '<option value="' + escapeHtml(r.full_name) + '">' + escapeHtml(r.full_name) + '</option>').join("");
+  if(current) sel.value = current;
 }
 function closeMobileSidebar(){
   $("#sidebar").classList.remove("open");
@@ -968,8 +1176,8 @@ function renderDisconnectedUI(){
   $("#patInput").value = "";
   $("#recentRepos").innerHTML = '<div class="empty-state"><i class="fa-regular fa-folder-open"></i><span>Connect to GitHub to see your repositories.</span></div>';
   $("#repoList").innerHTML = '<div class="empty-state"><i class="fa-brands fa-github"></i><span>Connect to GitHub on the Dashboard to load your repositories.</span></div>';
-  $("#statTotal").textContent = "—"; $("#statPublic").textContent = "—";
-  $("#statPrivate").textContent = "—"; $("#statStars").textContent = "—";
+  $("#statTotal").textContent = "0"; $("#statPublic").textContent = "0";
+  $("#statPrivate").textContent = "0"; $("#statStars").textContent = "0";
   populateUploadRepoSelect();
 }
 
@@ -995,6 +1203,10 @@ async function fetchRepos(){
     renderRepoList();
     renderRecentRepos();
     populateUploadRepoSelect();
+    populateRepoSelect($("#piRepoSelect"));
+    populateRepoSelect($("#actRepoSelect"));
+    populateRepoSelect($("#secRepoSelect"));
+    populateRepoSelect($("#secAlertRepoSelect"));
   }catch(err){
     repoListEl.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><span>' + escapeHtml(err.message) + '</span></div>';
     recentEl.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><span>' + escapeHtml(err.message) + '</span></div>';
@@ -1128,7 +1340,7 @@ function populateUploadRepoSelect(){
   const sel = $("#uploadRepoSelect");
   if(!state.token || !state.repos.length){
     sel.innerHTML = '<option value="">' + (state.token ? "No repositories available" : "Connect to GitHub first…") + '</option>';
-    $("#uploadBranchSelect").innerHTML = '<option value="">—</option>';
+    $("#uploadBranchSelect").innerHTML = '<option value="">-</option>';
     return;
   }
   sel.innerHTML = '<option value="">Select a repository…</option>' +
@@ -1284,6 +1496,410 @@ async function uploadToGitHub(){
   }
 }
 
+/* ===================== Pull Requests & Issues ===================== */
+async function loadPullsOrIssues(){
+  const fullName = $("#piRepoSelect").value;
+  const type = $("#piTypeSelect").value;
+  const state_ = $("#piStateSelect").value;
+  const el = $("#piList");
+  if(!fullName){ el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-code-pull-request"></i><span>Select a repository to view its pull requests or issues.</span></div>'; return; }
+  el.innerHTML = '<div class="loading-row"><span class="spinner"></span> Loading…</div>';
+  try{
+    const endpoint = type === "pulls" ? "/pulls" : "/issues";
+    let items = await ghFetch("/repos/" + fullName + endpoint + "?state=" + state_ + "&per_page=50");
+    if(type === "issues") items = items.filter(i => !i.pull_request);
+    if(!items.length){ el.innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-check"></i><span>Nothing to show here.</span></div>'; return; }
+    el.innerHTML = items.map(it => piRowHtml(it, type, fullName)).join("");
+    bindPiRowEvents(el, fullName, type);
+  }catch(err){
+    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><span>' + escapeHtml(err.message) + '</span></div>';
+  }
+}
+function piRowHtml(it, type, fullName){
+  const stateBadge = it.state === "open" ? '<span class="badge badge-success">Open</span>' : '<span class="badge badge-danger">Closed</span>';
+  const closeLabel = type === "pulls" ? "Close PR" : "Close Issue";
+  return '<div class="repo-item" data-num="' + it.number + '">' +
+    '<div class="repo-main">' +
+      '<div class="repo-name">#' + it.number + ' ' + escapeHtml(it.title) + ' ' + stateBadge + '</div>' +
+      '<div class="repo-meta"><span><i class="fa-regular fa-user"></i> ' + escapeHtml(it.user ? it.user.login : "") + '</span>' +
+      '<span><i class="fa-regular fa-clock"></i> ' + timeAgo(it.updated_at) + '</span>' +
+      (type==="pulls" ? '<span><i class="fa-solid fa-code-branch"></i> ' + escapeHtml(it.head && it.head.ref || "") + ' &rarr; ' + escapeHtml(it.base && it.base.ref || "") + '</span>' : '') +
+      '</div>' +
+    '</div>' +
+    '<div class="repo-actions">' +
+      '<a class="btn btn-sm btn-ghost" href="' + it.html_url + '" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> View</a>' +
+      (it.state === "open" ? '<button class="btn btn-sm btn-danger" data-close="' + it.number + '"><i class="fa-solid fa-xmark"></i> ' + closeLabel + '</button>' : '') +
+      (type === "pulls" && it.state === "open" ? '<button class="btn btn-sm btn-primary" data-merge="' + it.number + '"><i class="fa-solid fa-code-merge"></i> Merge</button>' : '') +
+    '</div>' +
+  '</div>';
+}
+function bindPiRowEvents(container, fullName, type){
+  $all("[data-close]", container).forEach(btn => btn.addEventListener("click", () => closePiItem(fullName, btn.dataset.close, type)));
+  $all("[data-merge]", container).forEach(btn => btn.addEventListener("click", () => mergePr(fullName, btn.dataset.merge)));
+}
+async function closePiItem(fullName, number, type){
+  openConfirmModal({
+    heading: "Close #" + number,
+    body: "This will close " + (type==="pulls"?"pull request":"issue") + " #" + number + " on " + fullName + ".",
+    onConfirm: async () => {
+      try{
+        const endpoint = type === "pulls" ? "/pulls/" : "/issues/";
+        await ghFetch("/repos/" + fullName + endpoint + number, { method: "PATCH", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ state: "closed" }) });
+        toast("success", "Closed #" + number); logActivity("success", "Closed #" + number + " on " + fullName);
+        loadPullsOrIssues();
+      }catch(err){ toast("error", err.message); }
+    }
+  });
+}
+async function mergePr(fullName, number){
+  openConfirmModal({
+    heading: "Merge PR #" + number,
+    body: "This will merge pull request #" + number + " into its base branch on " + fullName + ".",
+    onConfirm: async () => {
+      try{
+        await ghFetch("/repos/" + fullName + "/pulls/" + number + "/merge", { method: "PUT", headers:{"Content-Type":"application/json"}, body: JSON.stringify({}) });
+        toast("success", "Merged PR #" + number); logActivity("success", "Merged PR #" + number + " on " + fullName);
+        loadPullsOrIssues();
+      }catch(err){ toast("error", err.message); }
+    }
+  });
+}
+async function createPiItem(){
+  const fullName = $("#piRepoSelect").value;
+  const type = $("#piTypeSelect").value;
+  const title = $("#piNewTitle").value.trim();
+  const body = $("#piNewBody").value.trim();
+  const head = $("#piNewHead").value.trim();
+  const base = $("#piNewBase").value.trim();
+  const statusEl = $("#piCreateStatus");
+  if(!fullName){ toast("error","Select a repository first."); return; }
+  if(!title){ statusEl.textContent = "Title is required."; return; }
+  if(type === "pulls" && (!head || !base)){ statusEl.textContent = "Head and base branches are required for a pull request."; return; }
+  statusEl.innerHTML = '<span class="spinner"></span> Creating…';
+  try{
+    if(type === "pulls"){
+      await ghFetch("/repos/" + fullName + "/pulls", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ title, head, base, body }) });
+    } else {
+      await ghFetch("/repos/" + fullName + "/issues", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ title, body }) });
+    }
+    statusEl.textContent = "Created successfully.";
+    toast("success", (type==="pulls"?"Pull request":"Issue") + " created.");
+    logActivity("success", "Created " + (type==="pulls"?"PR":"issue") + " on " + fullName);
+    $("#piNewTitle").value=""; $("#piNewBody").value=""; $("#piNewHead").value=""; $("#piNewBase").value="";
+    loadPullsOrIssues();
+  }catch(err){
+    statusEl.textContent = "";
+    toast("error", err.message);
+  }
+}
+function updatePiBranchRowVisibility(){
+  $("#piPrBranchRow").style.display = $("#piTypeSelect").value === "pulls" ? "grid" : "none";
+}
+
+/* ===================== Actions / Workflows ===================== */
+async function loadWorkflows(){
+  const fullName = $("#actRepoSelect").value;
+  const el = $("#actWorkflowList");
+  if(!fullName){ el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-gears"></i><span>Select a repository to view its workflows.</span></div>'; return; }
+  el.innerHTML = '<div class="loading-row"><span class="spinner"></span> Loading…</div>';
+  try{
+    const data = await ghFetch("/repos/" + fullName + "/actions/workflows?per_page=50");
+    if(!data.workflows.length){ el.innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-question"></i><span>No workflows found in this repository.</span></div>'; return; }
+    el.innerHTML = data.workflows.map(wf => {
+      const stBadge = wf.state === "active" ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-warning">' + escapeHtml(wf.state) + '</span>';
+      return '<div class="repo-item" data-wf="' + wf.id + '">' +
+        '<div class="repo-main"><div class="repo-name"><i class="fa-solid fa-gear"></i> ' + escapeHtml(wf.name) + ' ' + stBadge + '</div>' +
+        '<div class="repo-desc">' + escapeHtml(wf.path) + '</div></div>' +
+        '<div class="repo-actions">' +
+          '<a class="btn btn-sm btn-ghost" href="' + wf.html_url + '" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> View</a>' +
+          '<button class="btn btn-sm btn-primary" data-dispatch="' + wf.id + '"><i class="fa-solid fa-play"></i> Run</button>' +
+        '</div></div>';
+    }).join("");
+    $all("[data-dispatch]", el).forEach(btn => btn.addEventListener("click", () => dispatchWorkflow(fullName, btn.dataset.dispatch)));
+    loadWorkflowRuns(fullName);
+  }catch(err){
+    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><span>' + escapeHtml(err.message) + '</span></div>';
+  }
+}
+async function dispatchWorkflow(fullName, wfId){
+  try{
+    const repo = state.repos.find(r => r.full_name === fullName);
+    const ref = repo ? repo.default_branch : "main";
+    await ghFetch("/repos/" + fullName + "/actions/workflows/" + wfId + "/dispatches", {
+      method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ ref })
+    });
+    toast("success", "Workflow run triggered.");
+    logActivity("success", "Triggered workflow on " + fullName);
+    setTimeout(() => loadWorkflowRuns(fullName), 1500);
+  }catch(err){
+    toast("error", err.message || "Could not trigger workflow (it may not support manual dispatch).");
+  }
+}
+async function loadWorkflowRuns(fullName){
+  const el = $("#actRunsList");
+  el.innerHTML = '<div class="loading-row"><span class="spinner"></span> Loading…</div>';
+  try{
+    const data = await ghFetch("/repos/" + fullName + "/actions/runs?per_page=15");
+    if(!data.workflow_runs.length){ el.innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-question"></i><span>No runs yet.</span></div>'; return; }
+    el.innerHTML = data.workflow_runs.map(run => {
+      const cls = run.conclusion === "success" ? "badge-success" : run.conclusion === "failure" ? "badge-danger" : "badge-warning";
+      const label = run.conclusion || run.status;
+      return '<div class="repo-item"><div class="repo-main"><div class="repo-name">' + escapeHtml(run.name || run.display_title || ("Run #" + run.run_number)) +
+        ' <span class="badge ' + cls + '">' + escapeHtml(label) + '</span></div>' +
+        '<div class="repo-meta"><span><i class="fa-solid fa-code-branch"></i> ' + escapeHtml(run.head_branch) + '</span>' +
+        '<span><i class="fa-regular fa-clock"></i> ' + timeAgo(run.created_at) + '</span></div></div>' +
+        '<div class="repo-actions"><a class="btn btn-sm btn-ghost" href="' + run.html_url + '" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> View logs</a></div></div>';
+    }).join("");
+  }catch(err){
+    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><span>' + escapeHtml(err.message) + '</span></div>';
+  }
+}
+async function loadActionsVariables(){
+  const fullName = $("#actRepoSelect").value;
+  const el = $("#actVarList");
+  if(!fullName){ el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-sliders"></i><span>Select a repository first.</span></div>'; return; }
+  el.innerHTML = '<div class="loading-row"><span class="spinner"></span> Loading…</div>';
+  try{
+    const data = await ghFetch("/repos/" + fullName + "/actions/variables?per_page=100");
+    if(!data.variables.length){ el.innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-question"></i><span>No variables set.</span></div>'; return; }
+    el.innerHTML = data.variables.map(v => '<div class="repo-item"><div class="repo-main"><div class="repo-name">' + escapeHtml(v.name) + '</div>' +
+      '<div class="repo-desc">' + escapeHtml(v.value) + '</div></div>' +
+      '<div class="repo-actions"><button class="btn btn-sm btn-danger" data-delvar="' + escapeHtml(v.name) + '"><i class="fa-solid fa-trash"></i> Delete</button></div></div>').join("");
+    $all("[data-delvar]", el).forEach(btn => btn.addEventListener("click", () => deleteActionsVariable(fullName, btn.dataset.delvar)));
+  }catch(err){
+    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><span>' + escapeHtml(err.message) + '</span></div>';
+  }
+}
+async function saveActionsVariable(){
+  const fullName = $("#actRepoSelect").value;
+  const name = $("#actVarName").value.trim();
+  const value = $("#actVarValue").value;
+  const statusEl = $("#actVarStatus");
+  if(!fullName){ toast("error","Select a repository first."); return; }
+  if(!name){ statusEl.textContent = "Variable name is required."; return; }
+  statusEl.innerHTML = '<span class="spinner"></span> Saving…';
+  try{
+    try{
+      await ghFetch("/repos/" + fullName + "/actions/variables/" + encodeURIComponent(name), { method:"PATCH", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name, value }) });
+    }catch(e){
+      await ghFetch("/repos/" + fullName + "/actions/variables", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ name, value }) });
+    }
+    statusEl.textContent = "Saved.";
+    toast("success", "Variable " + name + " saved.");
+    logActivity("success", "Saved Actions variable " + name + " on " + fullName);
+    $("#actVarName").value=""; $("#actVarValue").value="";
+    loadActionsVariables();
+  }catch(err){
+    statusEl.textContent = "";
+    toast("error", err.message);
+  }
+}
+async function deleteActionsVariable(fullName, name){
+  openConfirmModal({
+    heading: "Delete variable",
+    body: 'This will delete the "' + name + '" Actions variable from ' + fullName + '.',
+    onConfirm: async () => {
+      try{
+        await ghFetch("/repos/" + fullName + "/actions/variables/" + encodeURIComponent(name), { method: "DELETE" });
+        toast("success", "Deleted variable " + name);
+        loadActionsVariables();
+      }catch(err){ toast("error", err.message); }
+    }
+  });
+}
+
+/* ===================== Secrets (libsodium-sealed) & Pages ===================== */
+function base64ToUint8Array(b64){
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+  return arr;
+}
+async function encryptSecretValue(value, publicKeyB64){
+  if(typeof nacl === "undefined" || !nacl.sealedbox){
+    throw new Error("Encryption library failed to load. Secrets cannot be saved safely without it.");
+  }
+  const messageBytes = new TextEncoder().encode(value);
+  const keyBytes = base64ToUint8Array(publicKeyB64);
+  const encryptedBytes = nacl.sealedbox(messageBytes, keyBytes);
+  let binary = "";
+  encryptedBytes.forEach(b => binary += String.fromCharCode(b));
+  return btoa(binary);
+}
+async function loadRepoSecrets(){
+  const fullName = $("#secRepoSelect").value;
+  const el = $("#secList");
+  if(!fullName){ el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-lock"></i><span>Select a repository to view its secrets.</span></div>'; return; }
+  el.innerHTML = '<div class="loading-row"><span class="spinner"></span> Loading…</div>';
+  try{
+    const data = await ghFetch("/repos/" + fullName + "/actions/secrets?per_page=100");
+    if(!data.secrets.length){ el.innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-question"></i><span>No secrets set.</span></div>'; return; }
+    el.innerHTML = data.secrets.map(s => '<div class="repo-item"><div class="repo-main"><div class="repo-name"><i class="fa-solid fa-key"></i> ' + escapeHtml(s.name) + '</div>' +
+      '<div class="repo-desc">Updated ' + timeAgo(s.updated_at) + '</div></div>' +
+      '<div class="repo-actions"><button class="btn btn-sm btn-danger" data-delsec="' + escapeHtml(s.name) + '"><i class="fa-solid fa-trash"></i> Delete</button></div></div>').join("");
+    $all("[data-delsec]", el).forEach(btn => btn.addEventListener("click", () => deleteRepoSecret(fullName, btn.dataset.delsec)));
+  }catch(err){
+    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><span>' + escapeHtml(err.message) + '</span></div>';
+  }
+}
+async function saveRepoSecret(){
+  const fullName = $("#secRepoSelect").value;
+  const name = $("#secName").value.trim();
+  const value = $("#secValue").value;
+  const statusEl = $("#secStatus");
+  if(!fullName){ toast("error","Select a repository first."); return; }
+  if(!name || !value){ statusEl.textContent = "Both name and value are required."; return; }
+  statusEl.innerHTML = '<span class="spinner"></span> Encrypting &amp; saving…';
+  try{
+    const pub = await ghFetch("/repos/" + fullName + "/actions/secrets/public-key");
+    const encrypted = await encryptSecretValue(value, pub.key);
+    await ghFetch("/repos/" + fullName + "/actions/secrets/" + encodeURIComponent(name), {
+      method: "PUT", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ encrypted_value: encrypted, key_id: pub.key_id })
+    });
+    statusEl.textContent = "Saved.";
+    toast("success", "Secret " + name + " saved.");
+    logActivity("success", "Saved secret " + name + " on " + fullName);
+    $("#secName").value=""; $("#secValue").value="";
+    loadRepoSecrets();
+  }catch(err){
+    statusEl.textContent = "";
+    toast("error", err.message);
+  }
+}
+async function deleteRepoSecret(fullName, name){
+  openConfirmModal({
+    heading: "Delete secret",
+    body: 'This will permanently delete the "' + name + '" secret from ' + fullName + '.',
+    onConfirm: async () => {
+      try{
+        await ghFetch("/repos/" + fullName + "/actions/secrets/" + encodeURIComponent(name), { method: "DELETE" });
+        toast("success", "Deleted secret " + name);
+        loadRepoSecrets();
+      }catch(err){ toast("error", err.message); }
+    }
+  });
+}
+async function loadPagesStatus(){
+  const fullName = $("#secRepoSelect").value;
+  const box = $("#pagesStatusBox");
+  if(!fullName){ box.textContent = "Select a repository to view its Pages configuration."; return; }
+  box.innerHTML = '<span class="spinner"></span> Checking Pages status…';
+  try{
+    const data = await ghFetch("/repos/" + fullName + "/pages");
+    box.innerHTML = '<span class="badge badge-success">Enabled</span> Live at <a href="' + data.html_url + '" target="_blank" rel="noopener">' + escapeHtml(data.html_url) + '</a> &middot; building from <strong>' + escapeHtml(data.source ? data.source.branch : "?") + (data.source && data.source.path && data.source.path !== "/" ? (" (" + data.source.path + ")") : "") + '</strong>';
+  }catch(err){
+    if(err.status === 404){
+      box.innerHTML = '<span class="badge badge-warning">Not enabled</span> GitHub Pages is not yet set up for this repository.';
+    } else {
+      box.innerHTML = '<span class="badge badge-danger">Error</span> ' + escapeHtml(err.message);
+    }
+  }
+}
+async function enableOrUpdatePages(){
+  const fullName = $("#secRepoSelect").value;
+  const branch = $("#pagesBranch").value.trim() || "main";
+  const path = $("#pagesPath").value || "/";
+  const statusEl = $("#pagesStatus");
+  if(!fullName){ toast("error","Select a repository first."); return; }
+  statusEl.innerHTML = '<span class="spinner"></span> Saving…';
+  try{
+    try{
+      await ghFetch("/repos/" + fullName + "/pages", {
+        method:"PUT", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ source: { branch, path } })
+      });
+    }catch(e){
+      await ghFetch("/repos/" + fullName + "/pages", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ source: { branch, path } })
+      });
+    }
+    statusEl.textContent = "Pages configuration saved.";
+    toast("success", "GitHub Pages updated for " + fullName);
+    logActivity("success", "Updated GitHub Pages for " + fullName);
+    loadPagesStatus();
+  }catch(err){
+    statusEl.textContent = "";
+    toast("error", err.message);
+  }
+}
+
+/* ===================== Security alerts ===================== */
+async function loadDependabotAlerts(){
+  const fullName = $("#secAlertRepoSelect").value;
+  const el = $("#dependabotList");
+  if(!fullName){ el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-bug"></i><span>Select a repository to view Dependabot alerts.</span></div>'; return; }
+  el.innerHTML = '<div class="loading-row"><span class="spinner"></span> Loading…</div>';
+  try{
+    const alerts = await ghFetch("/repos/" + fullName + "/dependabot/alerts?state=open&per_page=50");
+    if(!alerts.length){ el.innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-check"></i><span>No open Dependabot alerts. 🎉</span></div>'; return; }
+    el.innerHTML = alerts.map(a => {
+      const sev = a.security_advisory ? a.security_advisory.severity : "unknown";
+      const sevClass = sev === "critical" || sev === "high" ? "badge-danger" : sev === "medium" ? "badge-warning" : "badge-success";
+      return '<div class="repo-item"><div class="repo-main"><div class="repo-name">#' + a.number + ' ' + escapeHtml(a.dependency ? a.dependency.package.name : "") +
+        ' <span class="badge ' + sevClass + '">' + escapeHtml(sev) + '</span></div>' +
+        '<div class="repo-desc">' + escapeHtml(a.security_advisory ? a.security_advisory.summary : "") + '</div></div>' +
+        '<div class="repo-actions"><a class="btn btn-sm btn-ghost" href="' + a.html_url + '" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> View</a>' +
+        '<button class="btn btn-sm btn-danger" data-dismiss-dep="' + a.number + '"><i class="fa-solid fa-xmark"></i> Dismiss</button></div></div>';
+    }).join("");
+    $all("[data-dismiss-dep]", el).forEach(btn => btn.addEventListener("click", () => dismissDependabotAlert(fullName, btn.dataset.dismissDep)));
+  }catch(err){
+    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><span>' + escapeHtml(err.message) + '</span></div>';
+  }
+}
+async function dismissDependabotAlert(fullName, number){
+  openConfirmModal({
+    heading: "Dismiss alert #" + number,
+    body: "This will mark Dependabot alert #" + number + " as dismissed on " + fullName + ".",
+    onConfirm: async () => {
+      try{
+        await ghFetch("/repos/" + fullName + "/dependabot/alerts/" + number, {
+          method:"PATCH", headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({ state: "dismissed", dismissed_reason: "tolerable_risk" })
+        });
+        toast("success", "Dismissed alert #" + number);
+        logActivity("success", "Dismissed Dependabot alert #" + number + " on " + fullName);
+        loadDependabotAlerts();
+      }catch(err){ toast("error", err.message); }
+    }
+  });
+}
+async function loadSecretScanAlerts(){
+  const fullName = $("#secAlertRepoSelect").value;
+  const el = $("#secretScanList");
+  if(!fullName){ el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-key"></i><span>Select a repository to view secret scanning alerts.</span></div>'; return; }
+  el.innerHTML = '<div class="loading-row"><span class="spinner"></span> Loading…</div>';
+  try{
+    const alerts = await ghFetch("/repos/" + fullName + "/secret-scanning/alerts?state=open&per_page=50");
+    if(!alerts.length){ el.innerHTML = '<div class="empty-state"><i class="fa-regular fa-circle-check"></i><span>No open secret scanning alerts. 🎉</span></div>'; return; }
+    el.innerHTML = alerts.map(a => '<div class="repo-item"><div class="repo-main"><div class="repo-name">#' + a.number + ' ' + escapeHtml(a.secret_type_display_name || a.secret_type) + '</div>' +
+      '<div class="repo-desc">Detected ' + timeAgo(a.created_at) + '</div></div>' +
+      '<div class="repo-actions"><a class="btn btn-sm btn-ghost" href="' + a.html_url + '" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> View</a>' +
+      '<button class="btn btn-sm btn-danger" data-resolve-ss="' + a.number + '"><i class="fa-solid fa-xmark"></i> Resolve</button></div></div>').join("");
+    $all("[data-resolve-ss]", el).forEach(btn => btn.addEventListener("click", () => resolveSecretScanAlert(fullName, btn.dataset.resolveSs)));
+  }catch(err){
+    el.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><span>' + escapeHtml(err.message) + '</span></div>';
+  }
+}
+async function resolveSecretScanAlert(fullName, number){
+  openConfirmModal({
+    heading: "Resolve alert #" + number,
+    body: "This will mark secret scanning alert #" + number + " as resolved (false positive) on " + fullName + ".",
+    onConfirm: async () => {
+      try{
+        await ghFetch("/repos/" + fullName + "/secret-scanning/alerts/" + number, {
+          method:"PATCH", headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({ state: "resolved", resolution: "false_positive" })
+        });
+        toast("success", "Resolved alert #" + number);
+        logActivity("success", "Resolved secret scanning alert #" + number + " on " + fullName);
+        loadSecretScanAlerts();
+      }catch(err){ toast("error", err.message); }
+    }
+  });
+}
+
 /* ===================== Confirm modal ===================== */
 let confirmCallback = null;
 function openConfirmModal({heading, body, onConfirm}){
@@ -1369,7 +1985,7 @@ function init(){
   // Upload
   $("#uploadRepoSelect").addEventListener("change", (e) => {
     if(e.target.value) populateBranches(e.target.value);
-    else $("#uploadBranchSelect").innerHTML = '<option value="">—</option>';
+    else $("#uploadBranchSelect").innerHTML = '<option value="">-</option>';
     updateUploadButtonState();
   });
   $("#uploadBranchSelect").addEventListener("change", updateUploadButtonState);
@@ -1383,6 +1999,28 @@ function init(){
     if(e.dataTransfer.files && e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
   });
   $("#uploadBtn").addEventListener("click", uploadToGitHub);
+
+  // PRs & Issues
+  $("#piRepoSelect").addEventListener("change", loadPullsOrIssues);
+  $("#piTypeSelect").addEventListener("change", () => { updatePiBranchRowVisibility(); loadPullsOrIssues(); });
+  $("#piStateSelect").addEventListener("change", loadPullsOrIssues);
+  $("#piRefreshBtn").addEventListener("click", loadPullsOrIssues);
+  $("#piCreateBtn").addEventListener("click", createPiItem);
+  updatePiBranchRowVisibility();
+
+  // Actions / Workflows
+  $("#actRepoSelect").addEventListener("change", () => { loadWorkflows(); loadActionsVariables(); });
+  $("#actRefreshBtn").addEventListener("click", () => { loadWorkflows(); loadActionsVariables(); });
+  $("#actVarSaveBtn").addEventListener("click", saveActionsVariable);
+
+  // Secrets & Pages
+  $("#secRepoSelect").addEventListener("change", () => { loadRepoSecrets(); loadPagesStatus(); });
+  $("#secSaveBtn").addEventListener("click", saveRepoSecret);
+  $("#pagesEnableBtn").addEventListener("click", enableOrUpdatePages);
+
+  // Security alerts
+  $("#secAlertRepoSelect").addEventListener("change", () => { loadDependabotAlerts(); loadSecretScanAlerts(); });
+  $("#secAlertRefreshBtn").addEventListener("click", () => { loadDependabotAlerts(); loadSecretScanAlerts(); });
 
   // Activity
   $("#clearActivityBtn").addEventListener("click", () => openConfirmModal({
