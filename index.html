@@ -373,6 +373,99 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 .changelog-entry{border-left:3px solid var(--violet);padding-left:14px;margin-bottom:18px;}
 .changelog-entry h4{margin:0 0 4px 0;}
 .changelog-entry ul{margin:8px 0 0 0;padding-left:18px;color:var(--text-muted);font-size:.86rem;}
+
+/* ---------- Copilot ---------- */
+.copilot-layout{
+  display:grid;
+  grid-template-columns:300px 1fr;
+  gap:18px;
+  align-items:start;
+}
+@media(max-width:860px){.copilot-layout{grid-template-columns:1fr;}}
+.copilot-settings{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:18px;
+  position:sticky;
+  top:16px;
+}
+.copilot-settings h3{margin:0 0 4px 0;font-size:.95rem;display:flex;align-items:center;gap:8px;}
+.copilot-settings h3 i{color:var(--violet);}
+.copilot-settings .sub-note{font-size:.74rem;color:var(--text-muted);margin:0 0 14px 0;}
+.copilot-chat-panel{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+  height:min(70vh,640px);
+  min-height:420px;
+  overflow:hidden;
+}
+.copilot-chat-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;border-bottom:1px solid var(--border);
+}
+.copilot-chat-header-left{display:flex;align-items:center;gap:10px;}
+.copilot-avatar{
+  width:34px;height:34px;border-radius:10px;
+  background:linear-gradient(135deg,var(--violet),var(--violet-deep));
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:.95rem;flex-shrink:0;
+}
+.copilot-chat-title{font-weight:700;font-size:.92rem;}
+.copilot-chat-status{font-size:.72rem;color:var(--text-muted);}
+.copilot-messages{
+  flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;
+}
+.copilot-msg{display:flex;gap:10px;max-width:88%;}
+.copilot-msg.user{align-self:flex-end;flex-direction:row-reverse;}
+.copilot-msg-avatar{
+  width:28px;height:28px;border-radius:8px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:.75rem;color:#fff;
+  background:linear-gradient(135deg,var(--violet),var(--violet-deep));
+}
+.copilot-msg.user .copilot-msg-avatar{background:var(--lavender);color:var(--violet-deep);}
+.copilot-msg-bubble{
+  background:var(--lavender-soft);
+  border-radius:14px;
+  padding:10px 13px;
+  font-size:.86rem;
+  line-height:1.5;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+.copilot-msg.user .copilot-msg-bubble{background:var(--violet);color:#fff;}
+.copilot-msg.error .copilot-msg-bubble{background:var(--pink-soft);color:var(--danger);}
+.copilot-typing{display:flex;gap:4px;align-items:center;padding:4px 0;}
+.copilot-typing span{width:6px;height:6px;border-radius:50%;background:var(--text-muted);opacity:.5;animation:copilotBlink 1s infinite ease-in-out;}
+.copilot-typing span:nth-child(2){animation-delay:.15s;}
+.copilot-typing span:nth-child(3){animation-delay:.3s;}
+@keyframes copilotBlink{0%,80%,100%{opacity:.3;}40%{opacity:1;}}
+.copilot-input-row{
+  display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);
+  align-items:flex-end;
+}
+.copilot-input-row textarea{
+  flex:1;resize:none;max-height:120px;min-height:40px;
+  font-family:inherit;font-size:.86rem;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  padding:9px 11px;background:var(--bg);color:var(--text);
+}
+.copilot-input-row textarea:focus{outline:none;border-color:var(--violet);}
+.copilot-send-btn{
+  width:40px;height:40px;border-radius:var(--radius-sm);border:none;flex-shrink:0;
+  background:linear-gradient(135deg,var(--violet),var(--violet-deep));color:#fff;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.copilot-send-btn:disabled{opacity:.5;cursor:not-allowed;}
+.copilot-empty{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  color:var(--text-muted);gap:8px;text-align:center;padding:20px;font-size:.84rem;
+}
+.copilot-empty i{font-size:1.8rem;color:var(--violet);}
 .about-logo{width:84px;height:84px;border-radius:18px;box-shadow:var(--shadow-md);margin-bottom:12px;}
 .link-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
 .doodle{position:absolute;opacity:.5;pointer-events:none;}
@@ -452,12 +545,12 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
     <div class="nav" role="tablist" aria-orientation="vertical">
       <button class="nav-item active" data-page="dashboard" role="tab" aria-selected="true"><i class="fa-solid fa-gauge-high"></i> Dashboard</button>
       <button class="nav-item" data-page="repositories" role="tab" aria-selected="false"><i class="fa-solid fa-code-branch"></i> Repositories</button>
-      <button class="nav-item" data-page="create" role="tab" aria-selected="false"><i class="fa-solid fa-plus"></i> Create Repository</button>
       <button class="nav-item" data-page="upload" role="tab" aria-selected="false"><i class="fa-solid fa-upload"></i> Upload Files</button>
       <button class="nav-item" data-page="prissues" role="tab" aria-selected="false"><i class="fa-solid fa-code-pull-request"></i> PRs &amp; Issues</button>
       <button class="nav-item" data-page="actions" role="tab" aria-selected="false"><i class="fa-solid fa-gears"></i> Actions</button>
       <button class="nav-item" data-page="secrets" role="tab" aria-selected="false"><i class="fa-solid fa-key"></i> Secrets &amp; Pages</button>
       <button class="nav-item" data-page="security" role="tab" aria-selected="false"><i class="fa-solid fa-shield-halved"></i> Security</button>
+      <button class="nav-item" data-page="copilot" role="tab" aria-selected="false"><i class="fa-solid fa-robot"></i> Copilot</button>
       <button class="nav-item" data-page="activity" role="tab" aria-selected="false"><i class="fa-solid fa-clock-rotate-left"></i> Activity</button>
       <button class="nav-item" data-page="settings" role="tab" aria-selected="false"><i class="fa-solid fa-gear"></i> Settings</button>
       <button class="nav-item" data-page="changelog" role="tab" aria-selected="false"><i class="fa-solid fa-list-check"></i> Changelog</button>
@@ -539,7 +632,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
 
       <h2 class="section-title"><i class="fa-solid fa-bolt"></i> Quick Actions</h2>
       <div class="grid grid-3">
-        <button class="btn btn-block" data-goto="create"><i class="fa-solid fa-plus"></i> Create Repository</button>
+        <button class="btn btn-block" data-goto="repositories" data-open-create="1"><i class="fa-solid fa-plus"></i> Create Repository</button>
         <button class="btn btn-block" data-goto="upload"><i class="fa-solid fa-upload"></i> Upload Files</button>
         <button class="btn btn-block" data-goto="repositories"><i class="fa-solid fa-code-branch"></i> Browse Repositories</button>
       </div>
@@ -552,38 +645,15 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
           <h1><i class="fa-solid fa-code-branch" style="color:var(--violet)"></i> Repositories</h1>
           <p class="sub">Manage your GitHub repositories.</p>
         </div>
-        <button class="btn btn-primary btn-sm" id="repoRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
-      </div>
-      <div class="card">
-        <div class="toolbar">
-          <div class="search-wrap">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="search" id="repoSearch" placeholder="Search repositories...">
-          </div>
-          <select id="repoSort">
-            <option value="updated">Recently updated</option>
-            <option value="name">Name (A–Z)</option>
-            <option value="stars">Most stars</option>
-          </select>
-          <select id="repoFilter">
-            <option value="all">All repositories</option>
-            <option value="public">Public only</option>
-            <option value="private">Private only</option>
-          </select>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary btn-sm" id="toggleCreateRepoBtn"><i class="fa-solid fa-plus"></i> Create Repository</button>
+          <button class="btn btn-primary btn-sm" id="repoRefreshBtn"><i class="fa-solid fa-rotate"></i> Refresh</button>
         </div>
-        <div id="repoList"><div class="empty-state"><i class="fa-brands fa-github"></i><span>Connect to GitHub on the Dashboard to load your repositories.</span></div></div>
       </div>
-    </section>
 
-    <!-- ============ CREATE REPOSITORY ============ -->
-    <section class="page" id="page-create">
-      <div class="page-header">
-        <div>
-          <h1><i class="fa-solid fa-plus" style="color:var(--violet)"></i> Create Repository</h1>
-          <p class="sub">Spin up a brand-new GitHub repository.</p>
-        </div>
-      </div>
-      <div class="card" style="max-width:520px;">
+      <!-- ============ CREATE REPOSITORY (now inside Repositories) ============ -->
+      <div class="card" id="createRepoPanel" style="max-width:520px;display:none;">
+        <h2 class="section-title mt-0"><i class="fa-solid fa-plus"></i> Create Repository</h2>
         <div class="field">
           <label for="newRepoName">Repository name</label>
           <input type="text" id="newRepoName" placeholder="my-awesome-project">
@@ -605,6 +675,26 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
         </div>
         <button class="btn btn-primary btn-block" id="createRepoBtn"><i class="fa-solid fa-plus"></i> Create Repository</button>
         <p class="hint" id="createRepoStatus"></p>
+      </div>
+
+      <div class="card">
+        <div class="toolbar">
+          <div class="search-wrap">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="search" id="repoSearch" placeholder="Search repositories...">
+          </div>
+          <select id="repoSort">
+            <option value="updated">Recently updated</option>
+            <option value="name">Name (A–Z)</option>
+            <option value="stars">Most stars</option>
+          </select>
+          <select id="repoFilter">
+            <option value="all">All repositories</option>
+            <option value="public">Public only</option>
+            <option value="private">Private only</option>
+          </select>
+        </div>
+        <div id="repoList"><div class="empty-state"><i class="fa-brands fa-github"></i><span>Connect to GitHub on the Dashboard to load your repositories.</span></div></div>
       </div>
     </section>
 
@@ -811,6 +901,83 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
     </section>
 
+    <!-- ============ COPILOT ============ -->
+    <section class="page" id="page-copilot">
+      <div class="page-header">
+        <div>
+          <h1><i class="fa-solid fa-robot" style="color:var(--violet)"></i> Copilot</h1>
+          <p class="sub">An AI chat assistant for GitHub, repos and GitPilot related help.</p>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="copilotClearChatBtn"><i class="fa-solid fa-trash"></i> Clear chat</button>
+      </div>
+
+      <div class="copilot-layout">
+        <!-- Left: settings -->
+        <div class="copilot-settings">
+          <h3><i class="fa-solid fa-sliders"></i> Copilot Settings</h3>
+          <p class="sub-note">Uses OpenRouter. Your API key is stored only in this browser.</p>
+
+          <div class="field">
+            <label for="copilotApiKey">OpenRouter API key</label>
+            <input type="password" id="copilotApiKey" placeholder="sk-or-v1-...">
+          </div>
+
+          <div class="field">
+            <label for="copilotModel">Model</label>
+            <select id="copilotModel">
+              <option value="openai/gpt-4o-mini">openai/gpt-4o-mini</option>
+              <option value="openai/gpt-4o">openai/gpt-4o</option>
+              <option value="anthropic/claude-3.5-sonnet">anthropic/claude-3.5-sonnet</option>
+              <option value="anthropic/claude-3-haiku">anthropic/claude-3-haiku</option>
+              <option value="google/gemini-flash-1.5">google/gemini-flash-1.5</option>
+              <option value="meta-llama/llama-3.1-70b-instruct">meta-llama/llama-3.1-70b-instruct</option>
+              <option value="custom">Custom model id…</option>
+            </select>
+          </div>
+          <div class="field" id="copilotCustomModelField" style="display:none;">
+            <label for="copilotCustomModel">Custom model id</label>
+            <input type="text" id="copilotCustomModel" placeholder="provider/model-name">
+          </div>
+
+          <div class="field">
+            <label for="copilotRules">Rules / system prompt</label>
+            <textarea id="copilotRules" rows="5" style="width:100%;font-family:inherit;font-size:.82rem;padding:9px 11px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg);color:var(--text);resize:vertical;" placeholder="e.g. You are a helpful GitHub assistant. Keep answers short and practical.">You are Copilot, GitPilot's in-app assistant. Help the user with GitHub, Git workflows, repositories, pull requests, Actions, secrets and anything related to using GitPilot. Keep answers concise and practical.</textarea>
+          </div>
+
+          <div class="field">
+            <label for="copilotTemperature">Temperature: <span id="copilotTempValue">0.7</span></label>
+            <input type="range" id="copilotTemperature" min="0" max="1" step="0.1" value="0.7" style="width:100%;">
+          </div>
+
+          <button class="btn btn-primary btn-block" id="copilotSaveSettingsBtn"><i class="fa-solid fa-floppy-disk"></i> Save settings</button>
+          <p class="hint" id="copilotSettingsStatus"></p>
+        </div>
+
+        <!-- Right: chat -->
+        <div class="copilot-chat-panel">
+          <div class="copilot-chat-header">
+            <div class="copilot-chat-header-left">
+              <div class="copilot-avatar"><i class="fa-solid fa-robot"></i></div>
+              <div>
+                <div class="copilot-chat-title">Copilot</div>
+                <div class="copilot-chat-status" id="copilotStatusLine">Not configured. Add an OpenRouter API key to start.</div>
+              </div>
+            </div>
+          </div>
+          <div class="copilot-messages" id="copilotMessages">
+            <div class="copilot-empty" id="copilotEmptyState">
+              <i class="fa-solid fa-comments"></i>
+              <div>Ask Copilot about repos, PRs, Actions, secrets or anything GitHub related.</div>
+            </div>
+          </div>
+          <div class="copilot-input-row">
+            <textarea id="copilotInput" rows="1" placeholder="Message Copilot…"></textarea>
+            <button class="copilot-send-btn" id="copilotSendBtn" aria-label="Send"><i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ============ ACTIVITY ============ -->
     <section class="page" id="page-activity">
       <div class="page-header">
@@ -868,6 +1035,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
           <ul>
             <li>Promoted from beta to stable 1.0.0 release</li>
             <li>Added "Add to Home Screen" install support with app icon and manifest</li>
+            <li>Added Copilot, an AI chat assistant for GitHub and repo related help</li>
             <li>General stability and polish fixes</li>
           </ul>
         </div>
@@ -878,6 +1046,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
             <li>First launch on a new browser now shows a one-time setup prompt to save your Personal Access Token locally</li>
             <li>Token is stored only in this browser's local storage, never embedded in the app file or sent anywhere but the official GitHub API</li>
             <li>"Skip for now" dismisses the prompt without saving anything; it won't show again on that browser</li>
+            <li>Setup flow validates the token before saving, with inline error messaging on failure</li>
           </ul>
         </div>
         <div class="changelog-entry">
@@ -885,6 +1054,9 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
           <p class="muted" style="margin:0;font-size:.82rem;">Easier path to creating a GitHub token.</p>
           <ul>
             <li>Added an "Open GitHub Token Settings" button on the Dashboard connection card, linking directly to GitHub's fine-grained token creation page in a new tab</li>
+            <li>Moved "Create Repository" into the Repositories page for a single, consistent entry point</li>
+            <li>Added inline token scope hints to reduce setup errors</li>
+            <li>Improved connection error messaging on invalid or expired tokens</li>
           </ul>
         </div>
         <div class="changelog-entry">
@@ -913,11 +1085,8 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
           <ul>
             <li>Connect to GitHub via Personal Access Token with live validation</li>
             <li>Browse, search, sort and filter your repositories</li>
-            <li>Create new repositories (public or private, optional README)</li>
             <li>Upload individual files, multiple files, or ZIP archives (via JSZip) straight to a repo/branch</li>
             <li>Local activity log for completed operations (no credentials stored)</li>
-            <li>Light / dark / system theme support</li>
-            <li>Fully responsive layout for desktop, tablet and mobile</li>
           </ul>
         </div>
       </div>
@@ -1010,6 +1179,8 @@ const STORAGE_PERSIST_KEY = "gitpilot_persist_token";
 const STORAGE_SETUP_SEEN_KEY = "gitpilot_setup_seen";
 const STORAGE_THEME_KEY = "gitpilot_theme";
 const STORAGE_ACTIVITY_KEY = "gitpilot_activity";
+const STORAGE_COPILOT_SETTINGS_KEY = "gitpilot_copilot_settings";
+const STORAGE_COPILOT_CHAT_KEY = "gitpilot_copilot_chat";
 const PROJECT_URL = "https://github.com/ronakksdevelopment/gitpilot";
 const ISSUES_URL = "https://github.com/ronakksdevelopment/gitpilot/issues";
 const CONTRIB_URL = "https://github.com/ronakksdevelopment/gitpilot/blob/main/CONTRIBUTING.md";
@@ -1127,6 +1298,7 @@ function gotoPage(pageId){
   if(pageId === "actions") populateRepoSelect($("#actRepoSelect"));
   if(pageId === "secrets") populateRepoSelect($("#secRepoSelect"));
   if(pageId === "security") populateRepoSelect($("#secAlertRepoSelect"));
+  if(pageId === "copilot") initCopilotPage();
 }
 function populateRepoSelect(sel){
   if(!sel) return;
@@ -1404,6 +1576,8 @@ async function createRepository(){
     $("#newRepoName").value = ""; $("#newRepoDesc").value = "";
     populateUploadRepoSelect();
     gotoPage("repositories");
+    const panel = $("#createRepoPanel");
+    if(panel) panel.style.display = "none";
     renderRepoList();
     renderRecentRepos();
   }catch(err){
@@ -1994,6 +2168,212 @@ function closeConfirmModal(){
 }
 
 /* ===================== Init / Event bindings ===================== */
+/* ===================== Copilot (OpenRouter chat) ===================== */
+const copilotState = {
+  settings: { apiKey:"", model:"openai/gpt-4o-mini", customModel:"", rules:"", temperature:0.7 },
+  messages: [], // {role:"user"|"assistant", content}
+  sending: false
+};
+
+function loadCopilotSettings(){
+  try{
+    const raw = localStorage.getItem(STORAGE_COPILOT_SETTINGS_KEY);
+    if(raw) Object.assign(copilotState.settings, JSON.parse(raw));
+  }catch(e){}
+}
+function saveCopilotSettingsToStorage(){
+  try{ localStorage.setItem(STORAGE_COPILOT_SETTINGS_KEY, JSON.stringify(copilotState.settings)); }catch(e){}
+}
+function loadCopilotChat(){
+  try{
+    const raw = localStorage.getItem(STORAGE_COPILOT_CHAT_KEY);
+    copilotState.messages = raw ? JSON.parse(raw) : [];
+  }catch(e){ copilotState.messages = []; }
+}
+function saveCopilotChat(){
+  try{ localStorage.setItem(STORAGE_COPILOT_CHAT_KEY, JSON.stringify(copilotState.messages.slice(-200))); }catch(e){}
+}
+
+function applyCopilotSettingsToForm(){
+  const s = copilotState.settings;
+  $("#copilotApiKey").value = s.apiKey || "";
+  const knownModels = Array.from($("#copilotModel").options).map(o => o.value).filter(v => v !== "custom");
+  if(s.model && knownModels.includes(s.model)){
+    $("#copilotModel").value = s.model;
+    $("#copilotCustomModelField").style.display = "none";
+  } else if(s.model){
+    $("#copilotModel").value = "custom";
+    $("#copilotCustomModelField").style.display = "block";
+    $("#copilotCustomModel").value = s.model;
+  }
+  $("#copilotRules").value = s.rules || $("#copilotRules").value;
+  $("#copilotTemperature").value = (s.temperature !== undefined && s.temperature !== null) ? s.temperature : 0.7;
+  $("#copilotTempValue").textContent = $("#copilotTemperature").value;
+  updateCopilotStatusLine();
+}
+
+function updateCopilotStatusLine(){
+  const el = $("#copilotStatusLine");
+  if(!el) return;
+  if(!copilotState.settings.apiKey){
+    el.textContent = "Not configured. Add an OpenRouter API key to start.";
+  } else {
+    const model = copilotState.settings.model === "custom" ? copilotState.settings.customModel : copilotState.settings.model;
+    el.textContent = "Ready · " + (model || "no model selected");
+  }
+}
+
+function initCopilotPage(){
+  loadCopilotSettings();
+  applyCopilotSettingsToForm();
+  loadCopilotChat();
+  renderCopilotMessages();
+}
+
+function renderCopilotMessages(){
+  const container = $("#copilotMessages");
+  if(!container) return;
+  if(!copilotState.messages.length){
+    container.innerHTML = '<div class="copilot-empty" id="copilotEmptyState"><i class="fa-solid fa-comments"></i><div>Ask Copilot about repos, PRs, Actions, secrets or anything GitHub related.</div></div>';
+    return;
+  }
+  container.innerHTML = copilotState.messages.map(m => {
+    const isUser = m.role === "user";
+    const avatarIcon = isUser ? "fa-user" : "fa-robot";
+    return '<div class="copilot-msg ' + (isUser ? "user" : "") + (m.error ? " error" : "") + '">' +
+      '<div class="copilot-msg-avatar"><i class="fa-solid ' + avatarIcon + '"></i></div>' +
+      '<div class="copilot-msg-bubble">' + escapeHtml(m.content) + '</div></div>';
+  }).join("");
+  container.scrollTop = container.scrollHeight;
+}
+
+function addCopilotTypingIndicator(){
+  const container = $("#copilotMessages");
+  const el = document.createElement("div");
+  el.className = "copilot-msg";
+  el.id = "copilotTypingRow";
+  el.innerHTML = '<div class="copilot-msg-avatar"><i class="fa-solid fa-robot"></i></div>' +
+    '<div class="copilot-msg-bubble"><div class="copilot-typing"><span></span><span></span><span></span></div></div>';
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+}
+function removeCopilotTypingIndicator(){
+  const el = $("#copilotTypingRow");
+  if(el) el.remove();
+}
+
+function getCopilotModel(){
+  const sel = $("#copilotModel").value;
+  if(sel === "custom") return $("#copilotCustomModel").value.trim();
+  return sel;
+}
+
+async function sendCopilotMessage(){
+  if(copilotState.sending) return;
+  const input = $("#copilotInput");
+  const text = input.value.trim();
+  if(!text) return;
+  const apiKey = copilotState.settings.apiKey;
+  if(!apiKey){
+    toast("error", "Add your OpenRouter API key in Copilot settings first.");
+    return;
+  }
+  const model = (copilotState.settings.model === "custom" ? copilotState.settings.customModel : copilotState.settings.model) || "openai/gpt-4o-mini";
+
+  copilotState.messages.push({ role:"user", content:text });
+  saveCopilotChat();
+  renderCopilotMessages();
+  input.value = "";
+  input.style.height = "auto";
+
+  copilotState.sending = true;
+  $("#copilotSendBtn").disabled = true;
+  addCopilotTypingIndicator();
+
+  try{
+    const rules = copilotState.settings.rules || "You are Copilot, a helpful assistant for GitHub and GitPilot related tasks.";
+    const payloadMessages = [
+      { role:"system", content: rules },
+      ...copilotState.messages.slice(-20).map(m => ({ role: m.role, content: m.content }))
+    ];
+    const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + apiKey,
+        "HTTP-Referer": window.location.href,
+        "X-Title": "GitPilot Copilot"
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: payloadMessages,
+        temperature: parseFloat(copilotState.settings.temperature !== undefined ? copilotState.settings.temperature : 0.7)
+      })
+    });
+    const data = await resp.json();
+    removeCopilotTypingIndicator();
+    if(!resp.ok){
+      const errMsg = (data && data.error && data.error.message) ? data.error.message : ("Request failed with status " + resp.status);
+      throw new Error(errMsg);
+    }
+    const reply = data && data.choices && data.choices[0] && data.choices[0].message ? data.choices[0].message.content : "";
+    copilotState.messages.push({ role:"assistant", content: reply || "(no response)" });
+    saveCopilotChat();
+    renderCopilotMessages();
+  }catch(err){
+    removeCopilotTypingIndicator();
+    copilotState.messages.push({ role:"assistant", content: "Error: " + err.message, error:true });
+    saveCopilotChat();
+    renderCopilotMessages();
+    toast("error", "Copilot request failed: " + err.message);
+  }finally{
+    copilotState.sending = false;
+    $("#copilotSendBtn").disabled = false;
+  }
+}
+
+function bindCopilotEvents(){
+  $("#copilotModel").addEventListener("change", (e) => {
+    $("#copilotCustomModelField").style.display = e.target.value === "custom" ? "block" : "none";
+  });
+  $("#copilotTemperature").addEventListener("input", (e) => {
+    $("#copilotTempValue").textContent = e.target.value;
+  });
+  $("#copilotSaveSettingsBtn").addEventListener("click", () => {
+    copilotState.settings.apiKey = $("#copilotApiKey").value.trim();
+    copilotState.settings.model = $("#copilotModel").value;
+    copilotState.settings.customModel = $("#copilotCustomModel").value.trim();
+    copilotState.settings.rules = $("#copilotRules").value;
+    copilotState.settings.temperature = parseFloat($("#copilotTemperature").value);
+    saveCopilotSettingsToStorage();
+    updateCopilotStatusLine();
+    $("#copilotSettingsStatus").textContent = "Settings saved.";
+    toast("success", "Copilot settings saved.");
+    setTimeout(() => { const s = $("#copilotSettingsStatus"); if(s) s.textContent = ""; }, 3000);
+  });
+  $("#copilotSendBtn").addEventListener("click", sendCopilotMessage);
+  $("#copilotInput").addEventListener("keydown", (e) => {
+    if(e.key === "Enter" && !e.shiftKey){
+      e.preventDefault();
+      sendCopilotMessage();
+    }
+  });
+  $("#copilotInput").addEventListener("input", (e) => {
+    e.target.style.height = "auto";
+    e.target.style.height = Math.min(e.target.scrollHeight, 120) + "px";
+  });
+  $("#copilotClearChatBtn").addEventListener("click", () => openConfirmModal({
+    heading: "Clear Copilot chat",
+    body: "This will remove all messages in this conversation from local storage.",
+    onConfirm: () => {
+      copilotState.messages = [];
+      saveCopilotChat();
+      renderCopilotMessages();
+      toast("success", "Copilot chat cleared.");
+    }
+  }));
+}
+
 function init(){
   applyLogoImages();
   // Logo-driven branding already in HTML; set about links
@@ -2005,6 +2385,9 @@ function init(){
   renderActivity();
   renderDisconnectedUI();
   populateUploadRepoSelect();
+  loadCopilotSettings();
+  loadCopilotChat();
+  bindCopilotEvents();
 
   // Restore persisted token if present; otherwise offer one-time setup
   try{
@@ -2021,7 +2404,13 @@ function init(){
 
   // Nav
   $all(".nav-item").forEach(btn => btn.addEventListener("click", () => gotoPage(btn.dataset.page)));
-  $all("[data-goto]").forEach(btn => btn.addEventListener("click", () => gotoPage(btn.dataset.goto)));
+  $all("[data-goto]").forEach(btn => btn.addEventListener("click", () => {
+    gotoPage(btn.dataset.goto);
+    if(btn.dataset.openCreate){
+      const panel = $("#createRepoPanel");
+      if(panel) panel.style.display = "block";
+    }
+  }));
 
   // Mobile nav
   $("#hamburgerBtn").addEventListener("click", () => {
@@ -2106,6 +2495,12 @@ function init(){
 
   // Create repo
   $("#createRepoBtn").addEventListener("click", createRepository);
+  $("#toggleCreateRepoBtn").addEventListener("click", () => {
+    const panel = $("#createRepoPanel");
+    const open = panel.style.display !== "none";
+    panel.style.display = open ? "none" : "block";
+    if(!open) panel.scrollIntoView({behavior:"smooth", block:"start"});
+  });
 
   // Upload
   $("#uploadRepoSelect").addEventListener("change", (e) => {
