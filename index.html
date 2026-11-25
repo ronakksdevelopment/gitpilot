@@ -416,7 +416,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       <img src="" alt="GitPilot logo" class="gitpilot-logo-img">
       <div class="brand-text">
         <strong>GitPilot</strong>
-        <span class="beta-badge">BETA v0.7.0</span>
+        <span class="beta-badge">BETA v0.9.0</span>
       </div>
     </div>
     <div class="nav" role="tablist" aria-orientation="vertical">
@@ -485,7 +485,10 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
             <input type="checkbox" id="persistTokenCheck">
             <label for="persistTokenCheck" style="margin:0;font-weight:500;">Remember this token in this browser (localStorage). <span style="color:var(--danger);">Not recommended on shared devices (stored in plain text).</span></label>
           </div>
-          <button class="btn btn-primary" id="connectBtn"><i class="fa-solid fa-plug"></i> Connect to GitHub</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+            <button class="btn btn-primary" id="connectBtn"><i class="fa-solid fa-plug"></i> Connect to GitHub</button>
+            <button class="btn btn-ghost" id="openTokenSettingsBtn" type="button"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open GitHub Token Settings</button>
+          </div>
           <span id="connectStatus" class="muted" style="margin-left:10px;font-size:.82rem;"></span>
         </div>
       </div>
@@ -829,6 +832,22 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
       <div class="card">
         <div class="changelog-entry">
+          <h4>v0.9.0: One-Time Setup Flow <span class="badge badge-warning">Beta</span></h4>
+          <p class="muted" style="margin:0;font-size:.82rem;">Connect once per browser, no need to re-enter your token every visit.</p>
+          <ul>
+            <li>First launch on a new browser now shows a one-time setup prompt to save your Personal Access Token locally</li>
+            <li>Token is stored only in this browser's local storage, never embedded in the app file or sent anywhere but the official GitHub API</li>
+            <li>"Skip for now" dismisses the prompt without saving anything; it won't show again on that browser</li>
+          </ul>
+        </div>
+        <div class="changelog-entry">
+          <h4>v0.8.0: Faster Token Setup <span class="badge badge-warning">Beta</span></h4>
+          <p class="muted" style="margin:0;font-size:.82rem;">Easier path to creating a GitHub token.</p>
+          <ul>
+            <li>Added an "Open GitHub Token Settings" button on the Dashboard connection card, linking directly to GitHub's fine-grained token creation page in a new tab</li>
+          </ul>
+        </div>
+        <div class="changelog-entry">
           <h4>v0.7.0: UI Consistency Pass <span class="badge badge-warning">Beta</span></h4>
           <p class="muted" style="margin:0;font-size:.82rem;">Cleaned up wording and tightened layout consistency.</p>
           <ul>
@@ -873,7 +892,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
       <div class="card">
         <img src="" alt="GitPilot logo" class="gitpilot-logo-img about-logo">
-        <h2 style="margin:0 0 6px 0;">GitPilot <span class="beta-badge">BETA v0.7.0</span></h2>
+        <h2 style="margin:0 0 6px 0;">GitPilot <span class="beta-badge">BETA v0.9.0</span></h2>
         <p class="muted">GitPilot is an <strong>independent, open-source, community-driven companion</strong> for working with GitHub repositories. It is not an official GitHub product and is not affiliated with or endorsed by GitHub, Inc. or Microsoft Corporation.</p>
         <p class="muted">GitPilot talks directly to the official GitHub REST API from your browser. Your token stays with you, and no backend ever sees it.</p>
         <div class="link-row">
@@ -912,6 +931,26 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
   </div>
 </div>
 
+<div class="modal-backdrop" id="setupModalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="setupModalTitle">
+    <h3 id="setupModalTitle"><i class="fa-brands fa-github" style="color:var(--violet);"></i> One-time setup</h3>
+    <p>Paste your GitHub Personal Access Token once, and this browser will remember it and connect automatically every time you open GitPilot. Your token stays in this browser's local storage only.</p>
+    <div class="field">
+      <label for="setupPatInput">Personal Access Token</label>
+      <div class="input-group">
+        <input type="password" id="setupPatInput" placeholder="github_pat_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+        <button class="toggle-visibility" id="setupTogglePatBtn" type="button" aria-label="Show token"><i class="fa-solid fa-eye"></i></button>
+      </div>
+      <p class="hint">Don't have one yet? <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">Create a fine-grained token on GitHub &rarr;</a></p>
+    </div>
+    <p class="hint" id="setupModalStatus"></p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" id="setupSkipBtn">Skip for now</button>
+      <button class="btn btn-primary btn-sm" id="setupSaveBtn"><i class="fa-solid fa-floppy-disk"></i> Save &amp; Connect</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
 "use strict";
@@ -928,6 +967,7 @@ function applyLogoImages(){
 const GH_API = "https://api.github.com";
 const STORAGE_TOKEN_KEY = "gitpilot_token";
 const STORAGE_PERSIST_KEY = "gitpilot_persist_token";
+const STORAGE_SETUP_SEEN_KEY = "gitpilot_setup_seen";
 const STORAGE_THEME_KEY = "gitpilot_theme";
 const STORAGE_ACTIVITY_KEY = "gitpilot_activity";
 const PROJECT_URL = "https://github.com/ronakksdevelopment/gitpilot";
@@ -1926,13 +1966,16 @@ function init(){
   renderDisconnectedUI();
   populateUploadRepoSelect();
 
-  // Restore persisted token if present
+  // Restore persisted token if present; otherwise offer one-time setup
   try{
     const persisted = localStorage.getItem(STORAGE_PERSIST_KEY);
     const savedToken = localStorage.getItem(STORAGE_TOKEN_KEY);
+    const setupSeen = localStorage.getItem(STORAGE_SETUP_SEEN_KEY);
     if(persisted === "1" && savedToken){
       $("#persistTokenCheck").checked = true;
       connectWithToken(savedToken);
+    } else if(!setupSeen){
+      $("#setupModalBackdrop").classList.add("show");
     }
   }catch(e){}
 
@@ -1961,6 +2004,48 @@ function init(){
     connectWithToken(token);
   });
   $("#patInput").addEventListener("keydown", (e) => { if(e.key === "Enter") $("#connectBtn").click(); });
+  $("#openTokenSettingsBtn").addEventListener("click", () => {
+    window.open("https://github.com/settings/tokens?type=beta", "_blank", "noopener");
+    toast("success", "Opened GitHub token settings in a new tab. Generate a fine-grained PAT there, then paste it above.");
+  });
+
+  // One-time setup modal
+  $("#setupTogglePatBtn").addEventListener("click", () => {
+    const input = $("#setupPatInput");
+    const icon = $("#setupTogglePatBtn i");
+    if(input.type === "password"){ input.type = "text"; icon.className = "fa-solid fa-eye-slash"; }
+    else { input.type = "password"; icon.className = "fa-solid fa-eye"; }
+  });
+  function closeSetupModal(){
+    $("#setupModalBackdrop").classList.remove("show");
+    try{ localStorage.setItem(STORAGE_SETUP_SEEN_KEY, "1"); }catch(e){}
+  }
+  $("#setupSkipBtn").addEventListener("click", closeSetupModal);
+  $("#setupModalBackdrop").addEventListener("click", (e) => { if(e.target.id === "setupModalBackdrop") closeSetupModal(); });
+  $("#setupSaveBtn").addEventListener("click", async () => {
+    const token = $("#setupPatInput").value.trim();
+    const statusEl = $("#setupModalStatus");
+    if(!token){ statusEl.textContent = "Enter a Personal Access Token first."; return; }
+    statusEl.innerHTML = '<span class="spinner"></span> Validating token…';
+    try{
+      const user = await ghFetch("/user", { headers: { "Authorization": "Bearer " + token } });
+      state.token = token;
+      state.user = user;
+      try{
+        localStorage.setItem(STORAGE_TOKEN_KEY, token);
+        localStorage.setItem(STORAGE_PERSIST_KEY, "1");
+      }catch(e){}
+      $("#persistTokenCheck").checked = true;
+      renderConnectedUI();
+      closeSetupModal();
+      toast("success", "Connected as @" + user.login + ". This browser will remember your token next time.");
+      logActivity("success", "Connected to GitHub as @" + user.login + " (one-time setup)");
+      fetchRepos();
+    }catch(err){
+      statusEl.textContent = "";
+      toast("error", err.message || "Failed to connect to GitHub.");
+    }
+  });
   $("#disconnectBtn").addEventListener("click", () => openConfirmModal({
     heading:"Disconnect from GitHub",
     body:"This will remove your token from this session" + (localStorage.getItem(STORAGE_PERSIST_KEY)==="1" ? " and from local storage." : "."),
