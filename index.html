@@ -500,11 +500,24 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
     var btn=document.getElementById('gpDownloadBtn');
     if(!btn)return;
     btn.onclick=function(){
-      if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;}
-      else{
-        var a=document.createElement('a');
-        a.href=location.href;a.download='GitPilot.html';
-        document.body.appendChild(a);a.click();a.remove();
+      try{
+        if(deferredPrompt){
+          var p=deferredPrompt;
+          deferredPrompt=null;
+          p.prompt();
+          if(p.userChoice && typeof p.userChoice.catch==='function'){ p.userChoice.catch(function(){}); }
+        } else {
+          var html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+          var blob=new Blob([html],{type:'text/html'});
+          var url=URL.createObjectURL(blob);
+          var a=document.createElement('a');
+          a.href=url;a.download='GitPilot.html';
+          document.body.appendChild(a);a.click();a.remove();
+          setTimeout(function(){ URL.revokeObjectURL(url); },1000);
+        }
+      }catch(err){
+        if(typeof toast==='function'){ toast('error','Install/Download failed: '+(err&&err.message?err.message:err)); }
+        else{ console.error('Install/Download failed',err); }
       }
     };
   });
@@ -1169,16 +1182,19 @@ function applyLogoImages(){
   if(gpAppleIcon) gpAppleIcon.href = LOGO_DATA_URI;
   const themeColorNow = (document.documentElement.getAttribute("data-theme") === "dark") ? "#5c35a8" : "#7c4fd6";
   const manifest = {
-    name: "GitPilot", short_name: "GitPilot", start_url: ".", display: "standalone",
+    name: "GitPilot", short_name: "GitPilot", start_url: "./", display: "standalone",
     background_color: "#15121a", theme_color: themeColorNow,
     icons: [
       { src: LOGO_DATA_URI, sizes: "192x192", type: "image/png" },
       { src: LOGO_DATA_URI, sizes: "512x512", type: "image/png" }
     ]
   };
-  const blob = new Blob([JSON.stringify(manifest)], { type: "application/json" });
   const gpManifest = document.getElementById("gpManifest");
-  if(gpManifest) gpManifest.href = URL.createObjectURL(blob);
+  if(gpManifest){
+    try{
+      gpManifest.href = "data:application/manifest+json," + encodeURIComponent(JSON.stringify(manifest));
+    }catch(e){}
+  }
 }
 
 /* ===================== State ===================== */
