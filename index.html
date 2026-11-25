@@ -491,16 +491,9 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
 <link rel="manifest" id="gpManifest">
 <link rel="icon" id="gpIcon" sizes="192x192">
 <link rel="apple-touch-icon" id="gpAppleIcon">
-<meta name="theme-color" content="#7c3aed">
+<meta name="theme-color" id="gpThemeColor" content="#7c4fd6">
 <script>
 (function(){
-  var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="40" fill="#7c3aed"/><path d="M96 34c-34.2 0-62 27.8-62 62 0 27.4 17.8 50.6 42.4 58.8 3.1.6 4.2-1.3 4.2-3V138c-17.3 3.8-20.9-7.3-20.9-7.3-2.8-7.1-6.9-9-6.9-9-5.6-3.8.5-3.8.5-3.8 6.2.4 9.5 6.4 9.5 6.4 5.6 9.5 14.6 6.8 18.1 5.2.6-4 2.2-6.8 4-8.4-13.8-1.6-28.3-6.9-28.3-30.6 0-6.8 2.4-12.3 6.4-16.6-.6-1.6-2.8-8 .6-16.6 0 0 5.2-1.7 17 6.3a59 59 0 0 1 31 0c11.8-8 17-6.3 17-6.3 3.4 8.6 1.2 15 .6 16.6 4 4.3 6.4 9.8 6.4 16.6 0 23.8-14.5 29-28.4 30.6 2.3 1.9 4.3 5.7 4.3 11.6v17.2c0 1.7 1.1 3.7 4.3 3-24.6-8.2-42.3-31.4-42.3-58.8 0-34.2 27.8-62 62-62" fill="#fff"/></svg>';
-  var iconUrl='data:image/svg+xml;base64,'+btoa(svg);
-  document.getElementById('gpIcon').href=iconUrl;
-  document.getElementById('gpAppleIcon').href=iconUrl;
-  var manifest={name:"GitPilot",short_name:"GitPilot",start_url:".",display:"standalone",background_color:"#0f0f14",theme_color:"#7c3aed",icons:[{src:iconUrl,sizes:"192x192",type:"image/svg+xml"},{src:iconUrl,sizes:"512x512",type:"image/svg+xml"}]};
-  var blob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
-  document.getElementById('gpManifest').href=URL.createObjectURL(blob);
   var deferredPrompt;
   window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;});
   document.addEventListener('DOMContentLoaded',function(){
@@ -1170,6 +1163,22 @@ function applyLogoImages(){
   document.querySelectorAll(".gitpilot-logo-img").forEach(img => { img.src = LOGO_DATA_URI; });
   const favicon = document.getElementById("faviconLink");
   if(favicon) favicon.href = LOGO_DATA_URI;
+  const gpIcon = document.getElementById("gpIcon");
+  if(gpIcon) gpIcon.href = LOGO_DATA_URI;
+  const gpAppleIcon = document.getElementById("gpAppleIcon");
+  if(gpAppleIcon) gpAppleIcon.href = LOGO_DATA_URI;
+  const themeColorNow = (document.documentElement.getAttribute("data-theme") === "dark") ? "#5c35a8" : "#7c4fd6";
+  const manifest = {
+    name: "GitPilot", short_name: "GitPilot", start_url: ".", display: "standalone",
+    background_color: "#15121a", theme_color: themeColorNow,
+    icons: [
+      { src: LOGO_DATA_URI, sizes: "192x192", type: "image/png" },
+      { src: LOGO_DATA_URI, sizes: "512x512", type: "image/png" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type: "application/json" });
+  const gpManifest = document.getElementById("gpManifest");
+  if(gpManifest) gpManifest.href = URL.createObjectURL(blob);
 }
 
 /* ===================== State ===================== */
@@ -1273,6 +1282,10 @@ function applyTheme(theme){
   }
   $all(".theme-opt").forEach(el => el.classList.toggle("active", el.dataset.theme === theme));
   try{ localStorage.setItem(STORAGE_THEME_KEY, theme); }catch(e){}
+  const isDark = root.getAttribute("data-theme") === "dark";
+  const themeColorMeta = document.getElementById("gpThemeColor");
+  if(themeColorMeta) themeColorMeta.content = isDark ? "#5c35a8" : "#7c4fd6";
+  if(typeof LOGO_DATA_URI !== "undefined") applyLogoImages();
 }
 function initTheme(){
   let theme = "light";
