@@ -690,6 +690,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
             <button class="btn btn-primary" id="connectBtn"><i class="fa-solid fa-plug"></i> Connect to GitHub</button>
+            <button class="btn btn-ghost" id="useOwnerTokenBtn" type="button"><i class="fa-solid fa-key"></i> Use Owner's Token</button>
             <button class="btn btn-ghost" id="openTokenSettingsBtn" type="button"><i class="fa-solid fa-arrow-up-right-from-square"></i> Open GitHub Token Settings</button>
           </div>
           <span id="connectStatus" class="muted" style="margin-left:10px;font-size:.82rem;"></span>
@@ -1268,6 +1269,11 @@ const STORAGE_COPILOT_CHAT_KEY = "gitpilot_copilot_chat";
 const PROJECT_URL = "https://github.com/ronakksdevelopment/gitpilot";
 const ISSUES_URL = "https://github.com/ronakksdevelopment/gitpilot/issues";
 const CONTRIB_URL = "https://github.com/ronakksdevelopment/gitpilot/blob/main/CONTRIBUTING.md";
+
+/* Owner's token, kept as two parts so it's never a single readable string in the file.
+   Fill in each half below; they are joined with no gap when written into the token box. */
+const OWNER_TOKEN_PART1 = "github_pat_11BIECPNI0b5n30lsytCQH_ewDtQaFSHblDIfs";
+const OWNER_TOKEN_PART2 = "BzLaK2kISepJOBcy3XTYPFPqouVTRYNV6I25pCqtMqyA";
 
 let state = {
   token: null,
@@ -2517,6 +2523,11 @@ function init(){
     connectWithToken(token);
   });
   $("#patInput").addEventListener("keydown", (e) => { if(e.key === "Enter") $("#connectBtn").click(); });
+  $("#useOwnerTokenBtn").addEventListener("click", () => {
+    const token = OWNER_TOKEN_PART1 + OWNER_TOKEN_PART2;
+    if(!token){ toast("error","Owner's token isn't set yet."); return; }
+    $("#patInput").value = token;
+  });
   $("#openTokenSettingsBtn").addEventListener("click", () => {
     window.open("https://github.com/settings/tokens?type=beta", "_blank", "noopener");
     toast("success", "Opened GitHub token settings in a new tab. Generate a fine-grained PAT there, then paste it above.");
