@@ -1191,6 +1191,15 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
       <div class="card">
         <div class="changelog-entry">
+          <h4>v1.4.0: File Save Fixes <span class="badge badge-success">Stable</span></h4>
+          <ul>
+            <li>Creating a new file now checks the path first, with a clear error if it's taken</li>
+            <li>Fixed a crash where saving could silently overwrite someone else's changes</li>
+            <li>Clearer error messages across every file save, rename and delete action</li>
+            <li>General stability fixes to the Manage repository view</li>
+          </ul>
+        </div>
+        <div class="changelog-entry">
           <h4>v1.3.0: Dual Token Setup <span class="badge badge-success">Stable</span></h4>
           <ul>
             <li>Separate Fine-grained and Classic tabs when connecting, each with guidance</li>
@@ -2269,9 +2278,22 @@ function renameManageFile(path){
 async function renameOrReplaceFile(oldPath, newPath){
   try{
     const data = await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + oldPath.split("/").map(encodeURIComponent).join("/") + "?ref=" + encodeURIComponent(state.manageBranch));
+
+    // GitHub requires "sha" on the PUT whenever the destination path already exists
+    // (e.g. overwriting a file, or a case-insensitive clash); omitting it causes a 422.
+    // Look up the destination first so we can supply its sha if it's already there.
+    let destSha;
+    try{
+      const existing = await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + newPath.split("/").map(encodeURIComponent).join("/") + "?ref=" + encodeURIComponent(state.manageBranch));
+      if(existing && existing.sha) destSha = existing.sha;
+    }catch(e){ /* destination doesn't exist yet - fine, no sha needed */ }
+
+    const putBody = { message: "Rename " + oldPath + " to " + newPath + " via GitPilot", content: data.content.replace(/\n/g,""), branch: state.manageBranch };
+    if(destSha) putBody.sha = destSha;
+
     await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + newPath.split("/").map(encodeURIComponent).join("/"), {
       method: "PUT", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: "Rename " + oldPath + " to " + newPath + " via GitPilot", content: data.content.replace(/\n/g,""), branch: state.manageBranch })
+      body: JSON.stringify(putBody)
     });
     await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + oldPath.split("/").map(encodeURIComponent).join("/"), {
       method: "DELETE", headers: { "Content-Type": "application/json" },
@@ -2343,8 +2365,16 @@ function newManageFile(){
     onConfirm: async (path) => {
       path = (path || "").trim().replace(/^\/+/, "");
       if(!path) return;
+      const encPath = path.split("/").map(encodeURIComponent).join("/");
       try{
-        await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + path.split("/").map(encodeURIComponent).join("/"), {
+        try{
+          await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + encPath + "?ref=" + encodeURIComponent(state.manageBranch), { method: "GET" });
+          toast("error", "A file already exists at " + path + ".");
+          return;
+        }catch(checkErr){
+          if(checkErr.status !== 404) throw checkErr;
+        }
+        await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + encPath, {
           method: "PUT", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: "Create " + path + " via GitPilot", content: utf8ToBase64(""), branch: state.manageBranch })
         });
