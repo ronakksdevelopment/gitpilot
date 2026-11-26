@@ -404,13 +404,16 @@ input[type="range"]::-moz-range-track{
 
 /* ---------- Modal ---------- */
 .modal-backdrop{
-  display:none;position:fixed;inset:0;background:rgba(21,18,26,.45);
-  z-index:150;align-items:center;justify-content:center;padding:20px;
+  display:none!important;position:fixed!important;top:0!important;left:0!important;
+  width:100%!important;height:100%!important;margin:0!important;background:rgba(21,18,26,.55);
+  z-index:999!important;align-items:center;justify-content:center;padding:20px;overflow-y:auto;
+  box-sizing:border-box!important;
 }
-.modal-backdrop.show{display:flex;}
+.modal-backdrop.show{display:flex!important;}
 .modal{
   background:var(--card);border-radius:var(--radius);padding:22px;max-width:420px;width:100%;
-  box-shadow:var(--shadow-md);border:1px solid var(--border);
+  box-shadow:var(--shadow-md);border:1px solid var(--border);position:relative;z-index:1;
+  margin:auto;flex-shrink:0;
 }
 .modal h3{margin:0 0 8px 0;display:flex;align-items:center;gap:8px;}
 .modal h3 i{color:var(--danger);}
@@ -1194,6 +1197,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
             <li>Drafts are remembered per tab, so switching never loses either token</li>
             <li>Polished the connection screen's contrast and borders in dark mode</li>
             <li>Create Repository panel now matches every other card's full width</li>
+            <li>Manage repository dialog now fully covers the screen on every device</li>
           </ul>
         </div>
         <div class="changelog-entry">
