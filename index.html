@@ -810,7 +810,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
 
       <!-- ============ CREATE REPOSITORY (now inside Repositories) ============ -->
-      <div class="card" id="createRepoPanel" style="max-width:520px;display:none;">
+      <div class="card" id="createRepoPanel" style="display:none;">
         <h2 class="section-title mt-0"><i class="fa-solid fa-plus"></i> Create Repository</h2>
         <div class="field">
           <label for="newRepoName">Repository name</label>
@@ -1190,13 +1190,14 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
         <div class="changelog-entry">
           <h4>v1.3.0: Dual Token Setup <span class="badge badge-success">Stable</span></h4>
           <ul>
-            <li>Separate Fine-grained and Classic tabs when connecting, each with its own guidance</li>
-            <li>GitPilot now remembers a draft token for each tab, so switching never loses either</li>
+            <li>Separate Fine-grained and Classic tabs when connecting, each with guidance</li>
+            <li>Drafts are remembered per tab, so switching never loses either token</li>
             <li>Polished the connection screen's contrast and borders in dark mode</li>
+            <li>Create Repository panel now matches every other card's full width</li>
           </ul>
         </div>
         <div class="changelog-entry">
-          <h4>v1.2.0: Repo Manager, Stars &amp; Permission Awareness <span class="badge badge-success">Stable</span></h4>
+          <h4>v1.2.0: Repo Manager &amp; Permissions <span class="badge badge-success">Stable</span></h4>
           <ul>
             <li>New "Manage" view to browse, open and edit repository files</li>
             <li>Flip a repo public or private, and control GitHub Pages, from the same view</li>
