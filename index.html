@@ -235,6 +235,98 @@ input[type="text"],input[type="password"],input[type="search"],select,textarea{
 }
 input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(124,79,214,0.15);}
 .field{margin-bottom:14px;}
+
+/* ---------- Custom select ---------- */
+select{
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  padding-right:36px;
+  cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236b6478' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='5 7.5 10 12.5 15 7.5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 12px center;
+  background-size:14px;
+}
+[data-theme="dark"] select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%23a79bc0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='5 7.5 10 12.5 15 7.5'/%3E%3C/svg%3E");
+}
+select option{background:var(--card);color:var(--text);}
+
+/* ---------- Custom checkbox / radio ---------- */
+input[type="checkbox"],input[type="radio"]{
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  width:18px;height:18px;flex-shrink:0;
+  border:1.5px solid var(--border);
+  background:var(--bg);
+  cursor:pointer;
+  position:relative;
+  display:inline-block;
+  vertical-align:middle;
+  transition:background .15s ease,border-color .15s ease;
+}
+input[type="checkbox"]{border-radius:5px;}
+input[type="radio"]{border-radius:50%;}
+input[type="checkbox"]:checked,input[type="radio"]:checked{
+  background:var(--violet);
+  border-color:var(--violet);
+}
+input[type="checkbox"]:checked::after{
+  content:"";
+  position:absolute;left:5px;top:1px;
+  width:5px;height:9px;
+  border:solid #fff;border-width:0 2px 2px 0;
+  transform:rotate(45deg);
+}
+input[type="radio"]:checked::after{
+  content:"";
+  position:absolute;left:50%;top:50%;
+  width:7px;height:7px;border-radius:50%;
+  background:#fff;
+  transform:translate(-50%,-50%);
+}
+input[type="checkbox"]:focus-visible,input[type="radio"]:focus-visible{
+  box-shadow:0 0 0 3px rgba(124,79,214,0.25);
+}
+
+/* ---------- Custom range slider ---------- */
+input[type="range"]{
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  width:100%;height:6px;
+  border-radius:3px;
+  background:var(--border);
+  outline:none;
+  cursor:pointer;
+}
+input[type="range"]::-webkit-slider-thumb{
+  appearance:none;-webkit-appearance:none;
+  width:17px;height:17px;border-radius:50%;
+  background:var(--violet);
+  border:2px solid var(--white,#fff);
+  box-shadow:0 1px 4px rgba(0,0,0,0.25);
+  cursor:pointer;
+  margin-top:-5.5px;
+  transition:transform .12s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover{transform:scale(1.1);}
+input[type="range"]::-webkit-slider-runnable-track{
+  height:6px;border-radius:3px;background:var(--border);
+}
+input[type="range"]::-moz-range-thumb{
+  width:17px;height:17px;border-radius:50%;
+  background:var(--violet);
+  border:2px solid var(--white,#fff);
+  box-shadow:0 1px 4px rgba(0,0,0,0.25);
+  cursor:pointer;
+}
+input[type="range"]::-moz-range-track{
+  height:6px;border-radius:3px;background:var(--border);
+}
+
+/* ---------- Custom scrollbars ---------- */
+*{scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+::-webkit-scrollbar{width:9px;height:9px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px;border:2px solid transparent;background-clip:padding-box;}
+::-webkit-scrollbar-thumb:hover{background:var(--text-muted);background-clip:padding-box;}
 .input-group{position:relative;display:flex;align-items:center;}
 .input-group input{padding-right:40px;}
 .input-group .toggle-visibility{
@@ -242,7 +334,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 }
 .hint{font-size:.74rem;color:var(--text-muted);margin-top:5px;}
 .checkbox-row{display:flex;align-items:flex-start;gap:8px;font-size:.82rem;color:var(--text-muted);}
-.checkbox-row input{width:auto;margin-top:2px;}
+.checkbox-row input{margin-top:2px;}
 
 /* ---------- Badges / tags ---------- */
 .badge{
@@ -371,8 +463,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--violet);box-shadow:0 
 
 /* ---------- Changelog / About ---------- */
 .changelog-entry{border-left:3px solid var(--violet);padding-left:14px;margin-bottom:18px;}
-.changelog-entry h4{margin:0 0 4px 0;}
-.changelog-entry ul{margin:8px 0 0 0;padding-left:18px;color:var(--text-muted);font-size:.86rem;}
+.changelog-entry h4{margin:0 0 6px 0;}
+.changelog-entry ul{margin:8px 0 0 0;padding-left:18px;color:var(--text-muted);font-size:.92rem;line-height:1.6;}
 
 /* ---------- Copilot ---------- */
 .copilot-layout{
@@ -486,43 +578,25 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
   .sidebar.open{transform:translateX(0);}
   .mobile-topbar{display:flex;}
   .main{margin-left:0;padding:20px 16px 50px 16px;}
+  .copilot-layout{gap:14px;}
+  .copilot-settings{position:static;top:auto;padding:14px;}
+  .copilot-chat-panel{
+    height:calc(100vh - 230px);
+    height:calc(100svh - 230px);
+    min-height:360px;
+    max-height:640px;
+  }
+  .copilot-messages{padding:12px;}
+  .copilot-msg{max-width:94%;}
+  .copilot-input-row{padding:10px;}
+  .copilot-input-row textarea{font-size:16px;}
+  .copilot-settings input[type="text"],
+  .copilot-settings input[type="password"],
+  .copilot-settings select,
+  .copilot-settings textarea{font-size:16px;}
 }
 </style>
-<link rel="manifest" id="gpManifest">
-<link rel="icon" id="gpIcon" sizes="192x192">
 <link rel="apple-touch-icon" id="gpAppleIcon">
-<meta name="theme-color" id="gpThemeColor" content="#7c4fd6">
-<script>
-(function(){
-  var deferredPrompt;
-  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferredPrompt=e;});
-  document.addEventListener('DOMContentLoaded',function(){
-    var btn=document.getElementById('gpDownloadBtn');
-    if(!btn)return;
-    btn.onclick=function(){
-      try{
-        if(deferredPrompt){
-          var p=deferredPrompt;
-          deferredPrompt=null;
-          p.prompt();
-          if(p.userChoice && typeof p.userChoice.catch==='function'){ p.userChoice.catch(function(){}); }
-        } else {
-          var html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
-          var blob=new Blob([html],{type:'text/html'});
-          var url=URL.createObjectURL(blob);
-          var a=document.createElement('a');
-          a.href=url;a.download='GitPilot.html';
-          document.body.appendChild(a);a.click();a.remove();
-          setTimeout(function(){ URL.revokeObjectURL(url); },1000);
-        }
-      }catch(err){
-        if(typeof toast==='function'){ toast('error','Install/Download failed: '+(err&&err.message?err.message:err)); }
-        else{ console.error('Install/Download failed',err); }
-      }
-    };
-  });
-})();
-</script>
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -545,7 +619,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       <img src="" alt="GitPilot logo" class="gitpilot-logo-img">
       <div class="brand-text">
         <strong>GitPilot</strong>
-        <span class="beta-badge" style="background:var(--green,#22c55e);color:#fff;">v1.0.0</span>
+        <span class="beta-badge" style="background:var(--green,#22c55e);color:#fff;">v1.1.0</span>
       </div>
     </div>
     <div class="nav" role="tablist" aria-orientation="vertical">
@@ -567,7 +641,6 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
         <span class="dot off" id="connDot"></span>
         <span id="connLabel">Not connected</span>
       </div>
-      <button id="gpDownloadBtn" class="btn btn-sm" title="Install / Download GitPilot" style="width:100%;margin:6px 0;"><i class="fa-solid fa-download"></i> Install App</button>
       <span>&copy; 2026 GitPilot - Community Project</span>
     </div>
   </nav>
@@ -671,8 +744,8 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
         <div class="field">
           <label>Visibility</label>
           <div style="display:flex;gap:16px;">
-            <label style="display:flex;align-items:center;gap:6px;font-weight:500;"><input type="radio" name="vis" value="public" checked style="width:auto;"> Public</label>
-            <label style="display:flex;align-items:center;gap:6px;font-weight:500;"><input type="radio" name="vis" value="private" style="width:auto;"> Private</label>
+            <label style="display:flex;align-items:center;gap:6px;font-weight:500;"><input type="radio" name="vis" value="public" checked> Public</label>
+            <label style="display:flex;align-items:center;gap:6px;font-weight:500;"><input type="radio" name="vis" value="private"> Private</label>
           </div>
         </div>
         <div class="checkbox-row" style="margin-bottom:16px;">
@@ -1036,63 +1109,66 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
       <div class="card">
         <div class="changelog-entry">
-          <h4>v1.0.0: Stable Release <span class="badge badge-success">Stable</span></h4>
-          <p class="muted" style="margin:0;font-size:.82rem;">GitPilot is out of beta.</p>
+          <h4>v1.1.0: Polish &amp; Fixes <span class="badge badge-success">Stable</span></h4>
           <ul>
-            <li>Promoted from beta to stable 1.0.0 release</li>
-            <li>Added "Add to Home Screen" install support with app icon and manifest</li>
-            <li>Added Copilot, an AI chat assistant for GitHub and repo related help</li>
-            <li>General stability and polish fixes</li>
+            <li>Dropped the install/manifest flow that was crashing on home screens</li>
+            <li>Straightened out Copilot's layout and sizing on mobile</li>
+            <li>Swapped browser-default checkboxes, radios, dropdowns and sliders for a themed look</li>
+            <li>Fixed a rendering bug that shrank checkboxes to nearly invisible</li>
+          </ul>
+        </div>
+        <div class="changelog-entry">
+          <h4>v1.0.0: Stable Release <span class="badge badge-success">Stable</span></h4>
+          <ul>
+            <li>GitPilot graduates from beta to a stable release</li>
+            <li>Introduced Copilot, an AI chat assistant for GitHub help</li>
+            <li>App icon and branding now follow your theme</li>
+            <li>A round of general stability and polish fixes</li>
           </ul>
         </div>
         <div class="changelog-entry">
           <h4>v0.9.0: One-Time Setup Flow <span class="badge badge-warning">Beta</span></h4>
-          <p class="muted" style="margin:0;font-size:.82rem;">Connect once per browser, no need to re-enter your token every visit.</p>
           <ul>
-            <li>First launch on a new browser now shows a one-time setup prompt to save your Personal Access Token locally</li>
-            <li>Token is stored only in this browser's local storage, never embedded in the app file or sent anywhere but the official GitHub API</li>
-            <li>"Skip for now" dismisses the prompt without saving anything; it won't show again on that browser</li>
-            <li>Setup flow validates the token before saving, with inline error messaging on failure</li>
+            <li>Paste your token once and GitPilot remembers it for next time</li>
+            <li>Token stays in this browser only, never sent elsewhere</li>
+            <li>"Skip for now" lets you dismiss setup without saving anything</li>
+            <li>Token gets validated up front, with a clear error if it fails</li>
           </ul>
         </div>
         <div class="changelog-entry">
           <h4>v0.8.0: Faster Token Setup <span class="badge badge-warning">Beta</span></h4>
-          <p class="muted" style="margin:0;font-size:.82rem;">Easier path to creating a GitHub token.</p>
           <ul>
-            <li>Added an "Open GitHub Token Settings" button on the Dashboard connection card, linking directly to GitHub's fine-grained token creation page in a new tab</li>
-            <li>Moved "Create Repository" into the Repositories page for a single, consistent entry point</li>
-            <li>Added inline token scope hints to reduce setup errors</li>
-            <li>Improved connection error messaging on invalid or expired tokens</li>
+            <li>Jump straight to GitHub's token creation page from the dashboard</li>
+            <li>Creating a repository now lives in one consistent place</li>
+            <li>Added scope hints so setup goes smoother the first time</li>
+            <li>Better errors when a token is invalid or has expired</li>
           </ul>
         </div>
         <div class="changelog-entry">
           <h4>v0.7.0: UI Consistency Pass <span class="badge badge-warning">Beta</span></h4>
-          <p class="muted" style="margin:0;font-size:.82rem;">Cleaned up wording and tightened layout consistency.</p>
           <ul>
-            <li>Removed em dashes from all UI copy in favor of plain punctuation</li>
-            <li>Synced the version badge across the sidebar and About page with the latest changelog entry</li>
-            <li>All 4 Dashboard stat boxes (Total, Public, Private, Stars) now share identical size and alignment via equal-height grid rows</li>
-            <li>Confirmed all colors are theme-driven (light/dark/system) with no stray hardcoded values</li>
+            <li>Swept out stray punctuation for a cleaner, plainer tone</li>
+            <li>Version number now matches across every page</li>
+            <li>Dashboard stat cards line up at equal size and height</li>
+            <li>Double-checked that every color follows the active theme</li>
           </ul>
         </div>
         <div class="changelog-entry">
           <h4>v0.6.0: Fine-Grained Token Support <span class="badge badge-warning">Beta</span></h4>
-          <p class="muted" style="margin:0;font-size:.82rem;">Expanded support for fine-grained PAT permissions.</p>
           <ul>
-            <li>Pull Requests &amp; Issues: browse, create, close and merge</li>
-            <li>Actions: view workflows, trigger runs (workflow_dispatch), view recent run status, manage repository variables</li>
-            <li>Secrets &amp; Pages: create/update/delete Actions secrets (client-side libsodium sealed-box encryption), enable/configure GitHub Pages</li>
-            <li>Security: view and dismiss/resolve Dependabot and secret scanning alerts</li>
+            <li>Browse, open, create, close and merge pull requests and issues</li>
+            <li>View and trigger Actions workflows, manage repo variables</li>
+            <li>Create and manage encrypted secrets, turn on GitHub Pages</li>
+            <li>Review and resolve Dependabot and secret-scanning alerts</li>
           </ul>
         </div>
         <div class="changelog-entry">
           <h4>v0.5.0: Initial Beta Release <span class="badge badge-warning">Beta</span></h4>
-          <p class="muted" style="margin:0;font-size:.82rem;">First public beta of GitPilot.</p>
           <ul>
-            <li>Connect to GitHub via Personal Access Token with live validation</li>
+            <li>Connect with a Personal Access Token, validated live</li>
             <li>Browse, search, sort and filter your repositories</li>
-            <li>Upload individual files, multiple files, or ZIP archives (via JSZip) straight to a repo/branch</li>
-            <li>Local activity log for completed operations (no credentials stored)</li>
+            <li>Upload files or an entire ZIP straight into a repo</li>
+            <li>A local activity log, with no credentials ever stored</li>
           </ul>
         </div>
       </div>
@@ -1107,7 +1183,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
       <div class="card">
         <img src="" alt="GitPilot logo" class="gitpilot-logo-img about-logo">
-        <h2 style="margin:0 0 6px 0;">GitPilot <span class="beta-badge" style="background:var(--green,#22c55e);color:#fff;">v1.0.0</span></h2>
+        <h2 style="margin:0 0 6px 0;">GitPilot <span class="beta-badge" style="background:var(--green,#22c55e);color:#fff;">v1.1.0</span></h2>
         <p class="muted">GitPilot is an <strong>independent, open-source, community-driven companion</strong> for working with GitHub repositories. It is not an official GitHub product and is not affiliated with or endorsed by GitHub, Inc. or Microsoft Corporation.</p>
         <p class="muted">GitPilot talks directly to the official GitHub REST API from your browser. Your token stays with you, and no backend ever sees it.</p>
         <div class="link-row">
@@ -1119,13 +1195,13 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
       <div class="card">
         <h2 class="section-title mt-0"><i class="fa-solid fa-scale-balanced"></i> Terms &amp; Disclaimers</h2>
-        <ul style="color:var(--text-muted);font-size:.86rem;line-height:1.7;padding-left:18px;">
-          <li><strong>Token security:</strong> your Personal Access Token is sent only to the official GitHub API over HTTPS. By default it is kept in memory only and cleared when you close or reload the tab; you may opt in to local storage persistence at your own risk.</li>
-          <li><strong>Permissions:</strong> only grant the minimum scopes your use case requires, and revoke tokens you no longer use from your GitHub settings. GitPilot's extra tabs (Actions, PRs &amp; Issues, Secrets &amp; Pages, Security) only work if your token includes the matching fine-grained permission. If a permission is missing you'll see a "Not found / lack permission" error from GitHub for that feature only.</li>
-          <li><strong>Never-expiring, all-repo tokens:</strong> a token with no expiration and access to every repository is a bigger risk if it ever leaks. Prefer an expiring token scoped only to the repositories you intend to manage here.</li>
-          <li><strong>User responsibility:</strong> you are solely responsible for actions performed with your token, including repository creation, uploads and deletions.</li>
-          <li><strong>GitHub API limitations:</strong> GitPilot is subject to GitHub's API rate limits, outages and policy changes, which are outside this project's control.</li>
-          <li><strong>Beta software:</strong> this is an early beta. Expect rough edges. Review destructive actions carefully before confirming them.</li>
+        <ul style="color:var(--text-muted);font-size:.92rem;line-height:1.7;padding-left:18px;">
+          <li><strong>Token security:</strong> sent only to GitHub's API over HTTPS. Stored locally only if you opt in.</li>
+          <li><strong>Permissions:</strong> grant only the scopes you need. Missing scopes show a GitHub error for that feature.</li>
+          <li><strong>Token scope:</strong> prefer an expiring token limited to the repos you manage here.</li>
+          <li><strong>Your responsibility:</strong> you are responsible for all actions taken with your token.</li>
+          <li><strong>API limits:</strong> subject to GitHub's rate limits, outages and policy changes.</li>
+          <li><strong>Independent project:</strong> not affiliated with or endorsed by GitHub or Microsoft.</li>
         </ul>
       </div>
     </section>
@@ -1176,25 +1252,8 @@ function applyLogoImages(){
   document.querySelectorAll(".gitpilot-logo-img").forEach(img => { img.src = LOGO_DATA_URI; });
   const favicon = document.getElementById("faviconLink");
   if(favicon) favicon.href = LOGO_DATA_URI;
-  const gpIcon = document.getElementById("gpIcon");
-  if(gpIcon) gpIcon.href = LOGO_DATA_URI;
   const gpAppleIcon = document.getElementById("gpAppleIcon");
   if(gpAppleIcon) gpAppleIcon.href = LOGO_DATA_URI;
-  const themeColorNow = (document.documentElement.getAttribute("data-theme") === "dark") ? "#5c35a8" : "#7c4fd6";
-  const manifest = {
-    name: "GitPilot", short_name: "GitPilot", start_url: "./", display: "standalone",
-    background_color: "#15121a", theme_color: themeColorNow,
-    icons: [
-      { src: LOGO_DATA_URI, sizes: "192x192", type: "image/png" },
-      { src: LOGO_DATA_URI, sizes: "512x512", type: "image/png" }
-    ]
-  };
-  const gpManifest = document.getElementById("gpManifest");
-  if(gpManifest){
-    try{
-      gpManifest.href = "data:application/manifest+json," + encodeURIComponent(JSON.stringify(manifest));
-    }catch(e){}
-  }
 }
 
 /* ===================== State ===================== */
@@ -1298,10 +1357,6 @@ function applyTheme(theme){
   }
   $all(".theme-opt").forEach(el => el.classList.toggle("active", el.dataset.theme === theme));
   try{ localStorage.setItem(STORAGE_THEME_KEY, theme); }catch(e){}
-  const isDark = root.getAttribute("data-theme") === "dark";
-  const themeColorMeta = document.getElementById("gpThemeColor");
-  if(themeColorMeta) themeColorMeta.content = isDark ? "#5c35a8" : "#7c4fd6";
-  if(typeof LOGO_DATA_URI !== "undefined") applyLogoImages();
 }
 function initTheme(){
   let theme = "light";
