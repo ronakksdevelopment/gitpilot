@@ -2412,18 +2412,28 @@ function populateUploadRepoSelect(){
 async function populateBranches(fullName){
   const sel = $("#uploadBranchSelect");
   sel.innerHTML = '<option value="">Loading branches…</option>';
+  const repo = state.repos.find(r => r.full_name === fullName);
+  const defaultBranch = repo ? (repo.default_branch || "main") : "main";
   try{
     let branches = state.branchesCache[fullName];
     if(!branches){
       branches = await ghFetch("/repos/" + fullName + "/branches?per_page=100");
       state.branchesCache[fullName] = branches;
     }
-    const repo = state.repos.find(r => r.full_name === fullName);
-    const defaultBranch = repo ? repo.default_branch : null;
-    sel.innerHTML = branches.map(b => '<option value="' + escapeHtml(b.name) + '"' + (b.name===defaultBranch ? ' selected' : '') + '>' + escapeHtml(b.name) + '</option>').join("");
+    if(!branches || !branches.length){
+      // Brand-new, empty repo (no commits yet) has no branches yet.
+      // The first upload will create the default branch, so offer it directly.
+      sel.innerHTML = '<option value="' + escapeHtml(defaultBranch) + '">' + escapeHtml(defaultBranch) + ' (new, empty)</option>';
+    } else {
+      sel.innerHTML = branches.map(b => '<option value="' + escapeHtml(b.name) + '"' + (b.name===defaultBranch ? ' selected' : '') + '>' + escapeHtml(b.name) + '</option>').join("");
+    }
   }catch(err){
-    sel.innerHTML = '<option value="">Failed to load branches</option>';
-    toast("error", err.message);
+    // Even if the branches list fails to load, let the user upload to the repo's
+    // default branch instead of silently leaving the Upload button disabled.
+    sel.innerHTML = '<option value="' + escapeHtml(defaultBranch) + '">' + escapeHtml(defaultBranch) + '</option>';
+    toast("error", "Couldn't load branches, defaulting to \"" + defaultBranch + "\". " + err.message);
+  }finally{
+    updateUploadButtonState();
   }
 }
 
