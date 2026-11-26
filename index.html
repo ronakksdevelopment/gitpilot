@@ -417,6 +417,50 @@ input[type="range"]::-moz-range-track{
 .modal p{color:var(--text-muted);font-size:.88rem;}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px;}
 
+/* ---------- Manage Repo modal ---------- */
+.modal-backdrop.wide .modal{max-width:980px;}
+.manage-modal{display:flex;flex-direction:column;max-height:86vh;}
+.manage-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.manage-head h3{margin:0;}
+.manage-body{display:flex;gap:16px;flex:1;min-height:0;overflow:hidden;}
+.manage-tree-col{width:280px;flex-shrink:0;display:flex;flex-direction:column;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
+.manage-tree-toolbar{display:flex;gap:6px;padding:8px;border-bottom:1px solid var(--border);background:var(--bg-soft,rgba(0,0,0,.015));}
+.manage-tree-toolbar select{flex:1;font-size:.78rem;padding:6px 8px;}
+.manage-tree{flex:1;overflow-y:auto;padding:6px;font-size:.84rem;}
+.tree-node{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;user-select:none;}
+.tree-node:hover{background:var(--lavender-soft);}
+.tree-node.active{background:var(--violet);color:#fff;}
+.tree-node.active i{color:#fff !important;}
+.tree-node i.fa-folder,.tree-node i.fa-folder-open{color:var(--warning);}
+.tree-node i.fa-file-lines,.tree-node i.fa-file-code,.tree-node i.fa-file{color:var(--text-muted);}
+.tree-children{padding-left:16px;}
+.tree-node-row{display:flex;align-items:center;gap:4px;}
+.tree-node-actions{display:none;gap:4px;margin-left:auto;}
+.tree-node-row:hover .tree-node-actions{display:flex;}
+.tree-node-actions button{background:none;border:none;color:inherit;opacity:.75;cursor:pointer;font-size:.78rem;padding:2px 4px;}
+.tree-node-actions button:hover{opacity:1;}
+.manage-editor-col{flex:1;display:flex;flex-direction:column;min-width:0;}
+.manage-editor-toolbar{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.manage-editor-path{font-size:.8rem;color:var(--text-muted);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.manage-editor-path strong{color:var(--text);}
+#manageFileEditor{
+  flex:1;width:100%;min-height:320px;resize:vertical;font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  font-size:.82rem;line-height:1.55;padding:12px;border-radius:var(--radius-sm);border:1px solid var(--border);
+  background:var(--bg,#fff);color:var(--text);tab-size:2;
+}
+.manage-empty-editor{flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);flex-direction:column;gap:10px;border:1px dashed var(--border);border-radius:var(--radius-sm);}
+.manage-empty-editor i{font-size:1.8rem;color:var(--lavender);}
+.manage-status{font-size:.76rem;color:var(--text-muted);margin-top:8px;min-height:16px;}
+.visibility-switch-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);margin-top:10px;}
+.visibility-link-box{display:flex;gap:6px;margin-top:8px;}
+.visibility-link-box input{flex:1;font-size:.78rem;}
+@media (max-width: 760px){
+  .manage-body{flex-direction:column;overflow-y:auto;}
+  .manage-tree-col{width:100%;max-height:220px;}
+  .modal-backdrop.wide .modal{max-width:96vw;}
+  .manage-modal{max-height:92vh;}
+}
+
 /* ---------- Upload dropzone ---------- */
 .dropzone{
   border:2px dashed var(--border);
@@ -595,6 +639,22 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
   .copilot-settings select,
   .copilot-settings textarea{font-size:16px;}
 }
+
+.token-type-toggle{display:flex;gap:10px;margin-bottom:14px;}
+.token-type-btn{
+  flex:1;border:1px solid var(--border);border-radius:var(--radius-sm);background:transparent;
+  padding:12px;text-align:center;cursor:pointer;font-size:.82rem;color:var(--text-muted);
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.token-type-btn i{font-size:1rem;}
+.token-type-btn.active{border-color:var(--violet);background:var(--lavender-soft);color:var(--violet-deep);font-weight:700;}
+.token-type-panel{display:none;}
+.token-type-panel.active{display:block;}
+.token-type-panel .hint{margin-top:6px;}
+.connected-token-switch{display:flex;gap:10px;margin:14px 0;}
+@media(max-width:560px){
+  .token-type-toggle,.connected-token-switch{flex-direction:column;}
+}
 </style>
 <link rel="apple-touch-icon" id="gpAppleIcon">
 </head>
@@ -619,7 +679,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       <img src="" alt="GitPilot logo" class="gitpilot-logo-img">
       <div class="brand-text">
         <strong>GitPilot</strong>
-        <span class="beta-badge" style="background:var(--green,#22c55e);color:#fff;">v1.1.0</span>
+        <span class="beta-badge" style="background:var(--green,#22c55e);color:#fff;">v1.3.0</span>
       </div>
     </div>
     <div class="nav" role="tablist" aria-orientation="vertical">
@@ -673,16 +733,34 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
               <button class="btn btn-danger btn-sm" id="disconnectBtn"><i class="fa-solid fa-plug-circle-xmark"></i> Disconnect</button>
             </div>
           </div>
+          <p class="hint" id="connectedTokenKindNote" style="margin-bottom:0;"></p>
+          <div class="connected-token-switch">
+            <button type="button" class="token-type-btn" id="switchToFineBtn"><i class="fa-solid fa-sliders"></i><div>Switch to fine-grained token</div></button>
+            <button type="button" class="token-type-btn" id="switchToClassicBtn"><i class="fa-solid fa-key"></i><div>Switch to classic token</div></button>
+          </div>
         </div>
         <div id="disconnectedView">
           <p class="muted" style="margin-top:0;">Connect your GitHub account using a Personal Access Token to manage your repositories.</p>
+
+          <div class="token-type-toggle" role="tablist">
+            <button type="button" class="token-type-btn active" id="tokenTypeFineBtn" role="tab" aria-selected="true" aria-controls="tokenPanelFine"><i class="fa-solid fa-sliders"></i><div>Fine-grained personal access tokens</div></button>
+            <button type="button" class="token-type-btn" id="tokenTypeClassicBtn" role="tab" aria-selected="false" aria-controls="tokenPanelClassic"><i class="fa-solid fa-key"></i><div>Personal access tokens (classic)</div></button>
+          </div>
+
+          <div class="token-type-panel active" id="tokenPanelFine" role="tabpanel" aria-labelledby="tokenTypeFineBtn">
+            <p class="hint" style="margin-top:0;">Scoped to specific repositories, with fine-grained permissions (Contents, Pull requests, Issues, Actions, Secrets, Pages, etc) and a built-in expiry. The safer default for most people. Note: fine-grained tokens can't star repositories.</p>
+          </div>
+          <div class="token-type-panel" id="tokenPanelClassic" role="tabpanel" aria-labelledby="tokenTypeClassicBtn">
+            <p class="hint" style="margin-top:0;">Scoped by broad permission like <code>repo</code>, <code>workflow</code> and <code>user</code>, across every repository you can access. Needed if you want to star or unstar repositories from GitPilot.</p>
+          </div>
+
           <div class="field">
             <label for="patInput">Personal Access Token</label>
             <div class="input-group">
               <input type="password" id="patInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
               <button class="toggle-visibility" id="togglePatBtn" type="button" aria-label="Show token"><i class="fa-solid fa-eye"></i></button>
             </div>
-            <p class="hint">Use a <strong>fine-grained personal access token</strong> with repo access, plus the permissions for any features you want (Actions, Pull requests, Issues, Secrets, Pages, Security events, Administration, etc). <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener">Create a token on GitHub &rarr;</a></p>
+            <p class="hint" id="patInputHint">Use a <strong>fine-grained personal access token</strong> with repo access, plus the permissions for any features you want (Actions, Pull requests, Issues, Secrets, Pages, Security events, Administration, etc). <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener" id="createTokenLink">Create a token on GitHub &rarr;</a></p>
           </div>
           <div class="checkbox-row" style="margin-bottom:14px;">
             <input type="checkbox" id="persistTokenCheck">
@@ -786,7 +864,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
           <p class="sub">Push files, folders or ZIP archives straight to a repository.</p>
         </div>
       </div>
-      <div class="card" style="max-width:640px;">
+      <div class="card">
         <div class="grid grid-2">
           <div class="field">
             <label for="uploadRepoSelect">Repository</label>
@@ -851,7 +929,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
 
       <h2 class="section-title"><i class="fa-solid fa-plus"></i> New</h2>
-      <div class="card" style="max-width:640px;">
+      <div class="card">
         <div class="field">
           <label for="piNewTitle">Title</label>
           <input type="text" id="piNewTitle" placeholder="Short summary">
@@ -1025,8 +1103,8 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
           </div>
 
           <div class="field">
-            <label for="copilotTemperature">Temperature: <span id="copilotTempValue">0.7</span></label>
-            <input type="range" id="copilotTemperature" min="0" max="1" step="0.1" value="0.7" style="width:100%;">
+            <label for="copilotTemperature">Temperature: <span id="copilotTempValue">0.5</span></label>
+            <input type="range" id="copilotTemperature" min="0" max="1" step="0.1" value="0.5" style="width:100%;">
           </div>
 
           <button class="btn btn-primary btn-block" id="copilotSaveSettingsBtn"><i class="fa-solid fa-floppy-disk"></i> Save settings</button>
@@ -1110,6 +1188,23 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
       <div class="card">
         <div class="changelog-entry">
+          <h4>v1.3.0: Dual Token Setup <span class="badge badge-success">Stable</span></h4>
+          <ul>
+            <li>Separate Fine-grained and Classic tabs when connecting, each with its own guidance</li>
+            <li>GitPilot now remembers a draft token for each tab, so switching never loses either</li>
+            <li>Polished the connection screen's contrast and borders in dark mode</li>
+          </ul>
+        </div>
+        <div class="changelog-entry">
+          <h4>v1.2.0: Repo Manager, Stars &amp; Permission Awareness <span class="badge badge-success">Stable</span></h4>
+          <ul>
+            <li>New "Manage" view to browse, open and edit repository files</li>
+            <li>Flip a repo public or private, and control GitHub Pages, from the same view</li>
+            <li>Star or unstar any repository straight from the repo list</li>
+            <li>Clearer permission errors, plus a Settings view of what your token can do</li>
+          </ul>
+        </div>
+        <div class="changelog-entry">
           <h4>v1.1.0: Polish &amp; Fixes <span class="badge badge-success">Stable</span></h4>
           <ul>
             <li>Dropped the install/manifest flow that was crashing on home screens</li>
@@ -1184,7 +1279,7 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       </div>
       <div class="card">
         <img src="" alt="GitPilot logo" class="gitpilot-logo-img about-logo">
-        <h2 style="margin:0 0 6px 0;">GitPilot <span class="beta-badge" style="background:var(--green,#22c55e);color:#fff;">v1.1.0</span></h2>
+        <h2 style="margin:0 0 6px 0;">GitPilot <span class="beta-badge" style="background:var(--green,#22c55e);color:#fff;">v1.3.0</span></h2>
         <p class="muted">GitPilot is an <strong>independent, open-source, community-driven companion</strong> for working with GitHub repositories. It is not an official GitHub product and is not affiliated with or endorsed by GitHub, Inc. or Microsoft Corporation.</p>
         <p class="muted">GitPilot talks directly to the official GitHub REST API from your browser. Your token stays with you, and no backend ever sees it.</p>
         <div class="link-row">
@@ -1197,12 +1292,10 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
       <div class="card">
         <h2 class="section-title mt-0"><i class="fa-solid fa-scale-balanced"></i> Terms &amp; Disclaimers</h2>
         <ul style="color:var(--text-muted);font-size:.92rem;line-height:1.7;padding-left:18px;">
-          <li><strong>Token security:</strong> sent only to GitHub's API over HTTPS. Stored locally only if you opt in.</li>
-          <li><strong>Permissions:</strong> grant only the scopes you need. Missing scopes show a GitHub error for that feature.</li>
-          <li><strong>Token scope:</strong> prefer an expiring token limited to the repos you manage here.</li>
-          <li><strong>Your responsibility:</strong> you are responsible for all actions taken with your token.</li>
-          <li><strong>API limits:</strong> subject to GitHub's rate limits, outages and policy changes.</li>
-          <li><strong>Independent project:</strong> not affiliated with or endorsed by GitHub or Microsoft.</li>
+          <li><strong>Token security:</strong> sent only to GitHub's API over HTTPS, and Settings shows exactly what your token can do.</li>
+          <li><strong>File editing and visibility:</strong> edits, new files, Pages changes and public/private flips made here apply straight to GitHub, with no undo inside GitPilot.</li>
+          <li><strong>Starring:</strong> needs a classic token with the <code>user</code> scope, since fine-grained tokens don't support it.</li>
+          <li><strong>Independent project:</strong> not affiliated with or endorsed by GitHub or Microsoft, and subject to GitHub's own rate limits and policies.</li>
         </ul>
       </div>
     </section>
@@ -1211,6 +1304,95 @@ hr.divider{border:none;border-top:1px solid var(--border);margin:18px 0;}
 </div>
 
 <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+<div class="modal-backdrop wide" id="manageRepoBackdrop">
+  <div class="modal manage-modal" role="dialog" aria-modal="true" aria-labelledby="manageRepoTitle">
+    <div class="manage-head">
+      <h3 id="manageRepoTitle"><i class="fa-solid fa-folder-tree" style="color:var(--violet);"></i> <span id="manageRepoName">Manage repository</span></h3>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <select id="manageBranchSelect" style="font-size:.8rem;padding:6px 8px;"></select>
+        <button class="btn btn-sm btn-ghost" id="manageRepoCloseBtn"><i class="fa-solid fa-xmark"></i> Close</button>
+      </div>
+    </div>
+
+    <div class="visibility-switch-row">
+      <span id="manageVisIcon"><i class="fa-solid fa-lock"></i></span>
+      <div style="flex:1;">
+        <strong id="manageVisLabel">Private</strong>
+        <div class="hint" style="margin:0;">Tick to make this repo public and get a shareable link.</div>
+      </div>
+      <label style="display:flex;align-items:center;gap:8px;font-weight:600;font-size:.84rem;">
+        <input type="checkbox" id="managePublicCheck"> Public
+      </label>
+    </div>
+    <div class="visibility-link-box" id="manageLinkBox" style="display:none;">
+      <input type="text" id="manageLinkInput" readonly>
+      <button class="btn btn-sm btn-ghost" id="manageLinkCopyBtn"><i class="fa-solid fa-copy"></i> Copy</button>
+      <a class="btn btn-sm btn-ghost" id="manageLinkOpenBtn" target="_blank" rel="noopener"><i class="fa-solid fa-up-right-from-square"></i> Open</a>
+    </div>
+
+    <div class="visibility-switch-row" style="flex-direction:column;align-items:stretch;gap:8px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <i class="fa-brands fa-github" style="color:var(--violet);"></i>
+        <div style="flex:1;">
+          <strong>GitHub Pages</strong>
+          <div class="hint" style="margin:0;" id="managePagesStatus">Checking…</div>
+        </div>
+        <select id="managePagesBranch" style="font-size:.78rem;padding:6px 8px;max-width:140px;"></select>
+        <select id="managePagesPath" style="font-size:.78rem;padding:6px 8px;">
+          <option value="/">/ (root)</option>
+          <option value="/docs">/docs</option>
+        </select>
+        <button class="btn btn-sm btn-primary" id="managePagesEnableBtn"><i class="fa-solid fa-rocket"></i> Enable / Update</button>
+      </div>
+      <p class="manage-status" id="managePagesSaveStatus" style="margin:0;"></p>
+    </div>
+
+    <div class="manage-body">
+      <div class="manage-tree-col">
+        <div class="manage-tree-toolbar">
+          <button class="btn btn-sm btn-ghost" id="manageNewFileBtn" title="New file"><i class="fa-solid fa-file-circle-plus"></i></button>
+          <button class="btn btn-sm btn-ghost" id="manageRefreshTreeBtn" title="Refresh"><i class="fa-solid fa-rotate"></i></button>
+        </div>
+        <div class="manage-tree" id="manageTree"><div class="empty-state"><span class="spinner"></span><span>Loading files…</span></div></div>
+      </div>
+      <div class="manage-editor-col">
+        <div id="manageEditorEmpty" class="manage-empty-editor">
+          <i class="fa-regular fa-file-lines"></i>
+          <span>Select a file on the left to view and edit it.</span>
+        </div>
+        <div id="manageEditorWrap" style="display:none;flex:1;display:flex;flex-direction:column;min-height:0;">
+          <div class="manage-editor-toolbar">
+            <div class="manage-editor-path"><strong id="manageEditorFileName">-</strong> <span id="manageEditorFilePath" style="opacity:.7;"></span></div>
+            <button class="btn btn-sm btn-ghost" id="manageRenameBtn"><i class="fa-solid fa-pen"></i> Rename</button>
+            <label class="btn btn-sm btn-ghost" id="manageReplaceLabel" style="cursor:pointer;">
+              <i class="fa-solid fa-file-arrow-up"></i> Replace file
+              <input type="file" id="manageReplaceInput" style="display:none;">
+            </label>
+            <button class="btn btn-sm btn-danger" id="manageDeleteFileBtn"><i class="fa-solid fa-trash"></i> Delete</button>
+            <button class="btn btn-sm btn-primary" id="manageSaveBtn"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+          </div>
+          <textarea id="manageFileEditor" spellcheck="false" placeholder="File content…"></textarea>
+          <p class="manage-status" id="manageStatus"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="promptModalBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="promptModalTitle">
+    <h3 id="promptModalTitle"><i class="fa-solid fa-pen"></i> <span id="promptModalHeading">Enter a value</span></h3>
+    <p id="promptModalBody" style="display:none;"></p>
+    <div class="field" style="margin-top:4px;">
+      <input type="text" id="promptModalInput">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" id="promptCancelBtn">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="promptOkBtn">Confirm</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-backdrop" id="confirmModalBackdrop">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
@@ -1261,6 +1443,8 @@ function applyLogoImages(){
 const GH_API = "https://api.github.com";
 const STORAGE_TOKEN_KEY = "gitpilot_token";
 const STORAGE_PERSIST_KEY = "gitpilot_persist_token";
+const STORAGE_DRAFT_FINE_KEY = "gitpilot_draft_token_fine";
+const STORAGE_DRAFT_CLASSIC_KEY = "gitpilot_draft_token_classic";
 const STORAGE_SETUP_SEEN_KEY = "gitpilot_setup_seen";
 const STORAGE_THEME_KEY = "gitpilot_theme";
 const STORAGE_ACTIVITY_KEY = "gitpilot_activity";
@@ -1278,10 +1462,18 @@ const OWNER_TOKEN_PART2 = "tQoHwmIk1mfQDG472coJ8wzALsTFLOA4XKBBMHzm54dP";
 let state = {
   token: null,
   user: null,
+  tokenScopes: [],
+  tokenType: null, // "classic" | "fine-grained" | null
   repos: [],
   reposLoaded: false,
   branchesCache: {},
   selectedFiles: [], // {file, name}
+  manageRepo: null,       // repo object currently open in Manage modal
+  manageBranch: null,
+  manageTree: null,       // flat list from git trees API: [{path,type,sha,size}]
+  manageTreeMap: {},      // path -> node (nested) built from manageTree
+  manageCurrentFile: null,// {path, sha, originalContent}
+  manageDirty: false,
 };
 
 /* ===================== Utilities ===================== */
@@ -1445,8 +1637,15 @@ async function ghFetch(path, options){
   if(!res.ok){
     let detail = "";
     try{ const body = await res.json(); detail = body && body.message ? body.message : ""; }catch(e){}
-    const err = new Error("GitHub API error (" + res.status + ")" + (detail ? ": " + detail : ""));
+    const isPermIssue = (res.status === 403 || res.status === 404) &&
+      /not accessible|requires authentication|permission|scope|forbidden/i.test(detail || "");
+    const msg = isPermIssue
+      ? "Your token doesn't have permission for this action" + (detail ? " (" + detail + ")" : "") + ". Check its scopes/permissions in GitHub token settings."
+      : ("GitHub API error (" + res.status + ")" + (detail ? ": " + detail : ""));
+    const err = new Error(msg);
     err.status = res.status;
+    err.isPermission = isPermIssue;
+    err.rawDetail = detail;
     throw err;
   }
   if(res.status === 204) return null;
@@ -1460,7 +1659,18 @@ async function connectWithToken(token){
   btn.disabled = true;
   statusEl.innerHTML = '<span class="spinner"></span> Validating token…';
   try{
-    const user = await ghFetch("/user", { headers: { "Authorization": "Bearer " + token } });
+    const headers = { "Authorization": "Bearer " + token };
+    const res = await fetch(GH_API + "/user", { headers: Object.assign({ "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" }, headers) });
+    if(!res.ok){
+      let detail = ""; try{ const b = await res.json(); detail = b && b.message ? b.message : ""; }catch(e){}
+      const err = new Error(res.status === 401 ? "Authentication failed. Your token may be invalid or expired." : ("GitHub API error (" + res.status + ")" + (detail ? ": " + detail : "")));
+      err.status = res.status;
+      throw err;
+    }
+    const user = await res.json();
+    const scopesHeader = res.headers.get("x-oauth-scopes");
+    state.tokenScopes = (scopesHeader && scopesHeader.trim()) ? scopesHeader.split(",").map(s=>s.trim()).filter(Boolean) : [];
+    state.tokenType = scopesHeader !== null ? "classic" : "fine-grained";
     state.token = token;
     state.user = user;
     if($("#persistTokenCheck").checked){
@@ -1488,6 +1698,8 @@ function disconnect(){
   state.user = null;
   state.repos = [];
   state.reposLoaded = false;
+  state.tokenScopes = [];
+  state.tokenType = null;
   try{
     localStorage.removeItem(STORAGE_TOKEN_KEY);
     localStorage.removeItem(STORAGE_PERSIST_KEY);
@@ -1506,7 +1718,19 @@ function renderConnectedUI(){
   $("#dashConnBadge").style.display = "inline-flex";
   $("#connDot").classList.remove("off"); $("#connDot").classList.add("on");
   $("#connLabel").textContent = "@" + state.user.login;
-  $("#settingsConnSummary").textContent = "Connected as @" + state.user.login + " (" + (state.user.name || "no public name") + ").";
+  let scopeNote = "";
+  if(state.tokenType === "classic"){
+    scopeNote = state.tokenScopes.length
+      ? " Classic token with scopes: " + state.tokenScopes.join(", ") + "."
+      : " Classic token with no scopes selected: most actions here will fail with a permission error.";
+  } else if(state.tokenType === "fine-grained"){
+    scopeNote = " Fine-grained token: its exact permissions aren't visible here; if an action fails, check its repository permissions in GitHub token settings. Note: starring repos needs a classic token.";
+  }
+  $("#settingsConnSummary").textContent = "Connected as @" + state.user.login + " (" + (state.user.name || "no public name") + ")." + scopeNote;
+  const isFineNow = state.tokenType === "fine-grained";
+  $("#connectedTokenKindNote").innerHTML = "Connected with a <strong>" + (isFineNow ? "fine-grained" : "classic") + "</strong> personal access token.";
+  $("#switchToFineBtn").style.display = isFineNow ? "none" : "flex";
+  $("#switchToClassicBtn").style.display = isFineNow ? "flex" : "none";
 }
 function renderDisconnectedUI(){
   $("#connectedView").style.display = "none";
@@ -1516,6 +1740,7 @@ function renderDisconnectedUI(){
   $("#connLabel").textContent = "Not connected";
   $("#settingsConnSummary").textContent = "Not connected.";
   $("#patInput").value = "";
+  if(typeof setTokenKind === "function") setTokenKind("fine-grained");
   $("#recentRepos").innerHTML = '<div class="empty-state"><i class="fa-regular fa-folder-open"></i><span>Connect to GitHub to see your repositories.</span></div>';
   $("#repoList").innerHTML = '<div class="empty-state"><i class="fa-brands fa-github"></i><span>Connect to GitHub on the Dashboard to load your repositories.</span></div>';
   $("#statTotal").textContent = "0"; $("#statPublic").textContent = "0";
@@ -1593,11 +1818,23 @@ function renderRepoList(){
   el.innerHTML = list.map(repoRowHtml).join("");
   bindRepoRowEvents(el);
 }
+function repoSiteUrl(repo){
+  if(repo._pagesUrl) return repo._pagesUrl;
+  if(repo.homepage && repo.homepage.trim()) return repo.homepage.trim();
+  if(repo.has_pages){
+    // has_pages is true but we haven't confirmed a live URL yet (not checked this session) -
+    // give the best guess, Manage > Pages will confirm/fix it if it's wrong.
+    const parts = repo.full_name.split("/");
+    return "https://" + parts[0] + ".github.io/" + parts[1] + "/";
+  }
+  return null;
+}
 function repoRowHtml(repo){
+  const site = repoSiteUrl(repo);
   return '<div class="repo-item" data-repo="' + escapeHtml(repo.full_name) + '">' +
     '<div class="repo-main">' +
       '<div class="repo-name"><i class="fa-solid fa-' + (repo.private ? 'lock' : 'book') + '"></i> ' + escapeHtml(repo.name) +
-        '<span class="badge ' + (repo.private ? 'badge-private' : 'badge-public') + '">' + (repo.private ? 'Private' : 'Public') + '</span></div>' +
+        '<span class="badge ' + (repo.private ? 'badge-private' : 'badge-public') + '" data-vis-badge="' + escapeHtml(repo.full_name) + '">' + (repo.private ? 'Private' : 'Public') + '</span></div>' +
       (repo.description ? '<div class="repo-desc">' + escapeHtml(repo.description) + '</div>' : '') +
       '<div class="repo-meta">' +
         (repo.language ? '<span><span class="lang-dot"></span>' + escapeHtml(repo.language) + '</span>' : '') +
@@ -1607,7 +1844,12 @@ function repoRowHtml(repo){
       '</div>' +
     '</div>' +
     '<div class="repo-actions">' +
-      '<a class="btn btn-sm btn-ghost" href="' + repo.html_url + '" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> View</a>' +
+      '<button class="btn btn-sm btn-primary" data-manage-repo="' + escapeHtml(repo.full_name) + '"><i class="fa-solid fa-folder-tree"></i> Manage</button>' +
+      '<a class="btn btn-sm btn-ghost" href="' + repo.html_url + '" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> Open repo</a>' +
+      '<a class="btn btn-sm btn-ghost" ' + (site ? ('href="' + escapeHtml(site) + '" target="_blank" rel="noopener"') : 'aria-disabled="true" style="opacity:.45;pointer-events:none;" title="No live site detected"') + '><i class="fa-solid fa-globe"></i> Open site</a>' +
+      '<button class="btn btn-sm btn-ghost" data-toggle-star="' + escapeHtml(repo.full_name) + '" data-starred="' + (repo.viewer_has_starred ? "1" : "0") + '" title="' + (repo.viewer_has_starred ? "Unstar this repo" : "Star this repo") + '"><i class="fa-' + (repo.viewer_has_starred ? "solid" : "regular") + ' fa-star" style="' + (repo.viewer_has_starred ? "color:var(--warning);" : "") + '"></i></button>' +
+      '<button class="btn btn-sm btn-ghost" data-toggle-vis="' + escapeHtml(repo.full_name) + '" title="Make ' + (repo.private ? 'public' : 'private') + '"><i class="fa-solid fa-' + (repo.private ? 'lock-open' : 'lock') + '"></i></button>' +
+      '<button class="btn btn-sm btn-ghost" data-copy-link="' + escapeHtml(repo.full_name) + '" title="Copy repo link"><i class="fa-solid fa-link"></i></button>' +
       '<button class="btn btn-sm btn-danger" data-delete-repo="' + escapeHtml(repo.full_name) + '"><i class="fa-solid fa-trash"></i> Delete</button>' +
     '</div>' +
   '</div>';
@@ -1615,6 +1857,132 @@ function repoRowHtml(repo){
 function bindRepoRowEvents(container){
   $all("[data-delete-repo]", container).forEach(btn => {
     btn.addEventListener("click", () => confirmDeleteRepo(btn.dataset.deleteRepo));
+  });
+  $all("[data-manage-repo]", container).forEach(btn => {
+    btn.addEventListener("click", () => openManageRepoModal(btn.dataset.manageRepo));
+  });
+  $all("[data-toggle-vis]", container).forEach(btn => {
+    btn.addEventListener("click", () => toggleRepoVisibility(btn.dataset.toggleVis));
+  });
+  $all("[data-copy-link]", container).forEach(btn => {
+    btn.addEventListener("click", () => copyRepoLink(btn.dataset.copyLink));
+  });
+  $all("[data-toggle-star]", container).forEach(btn => {
+    btn.addEventListener("click", () => toggleStarRepo(btn.dataset.toggleStar));
+    if(btn.dataset.starChecked !== "1"){
+      btn.dataset.starChecked = "1";
+      refreshStarButton(btn.dataset.toggleStar, btn);
+    }
+  });
+}
+
+async function refreshStarButton(fullName, btn){
+  const repo = state.repos.find(r => r.full_name === fullName);
+  if(!repo) return;
+  if(typeof repo.viewer_has_starred === "boolean"){ paintStarButton(btn, repo.viewer_has_starred, repo); return; }
+  try{
+    await ghFetch("/user/starred/" + fullName);
+    repo.viewer_has_starred = true;
+    repo._starPermIssue = false;
+  }catch(err){
+    if(err.status === 404){
+      repo.viewer_has_starred = false;
+      repo._starPermIssue = false;
+    } else if(err.isPermission || err.status === 401){
+      // Token can't even check star status - disable the control instead of guessing its state.
+      repo._starPermIssue = true;
+    }
+    // any other error (network, rate limit): leave state unknown for now, don't guess, try again next render.
+  }
+  if(btn && btn.isConnected) paintStarButton(btn, repo.viewer_has_starred, repo);
+}
+function paintStarButton(btn, starred, repo){
+  if(!btn) return;
+  if(repo && repo._starPermIssue){
+    btn.disabled = true;
+    btn.title = "Your token doesn't have permission to star repos. Use a classic token with the 'user' scope.";
+    const icon = btn.querySelector("i");
+    if(icon) icon.className = "fa-regular fa-star";
+    return;
+  }
+  btn.disabled = false;
+  btn.dataset.starred = starred ? "1" : "0";
+  btn.title = starred ? "Unstar this repo" : "Star this repo";
+  const icon = btn.querySelector("i");
+  if(icon){
+    icon.className = "fa-" + (starred ? "solid" : "regular") + " fa-star";
+    icon.style.color = starred ? "var(--warning)" : "";
+  }
+}
+async function toggleStarRepo(fullName){
+  const repo = state.repos.find(r => r.full_name === fullName);
+  if(!repo) return;
+  if(repo._starPermIssue){
+    toast("error", "Your token doesn't have permission to star repos. Use a classic PAT with the 'user' scope (fine-grained tokens don't support starring).");
+    return;
+  }
+  const makeStarred = !repo.viewer_has_starred;
+  const btns = $all('[data-toggle-star="' + CSS.escape(fullName) + '"]');
+  btns.forEach(b => b.disabled = true);
+  try{
+    await ghFetch("/user/starred/" + fullName, { method: makeStarred ? "PUT" : "DELETE", headers: { "Content-Type": "application/json" } });
+    repo.viewer_has_starred = makeStarred;
+    repo.stargazers_count = Math.max(0, (repo.stargazers_count||0) + (makeStarred ? 1 : -1));
+    btns.forEach(b => paintStarButton(b, makeStarred, repo));
+    renderRepoList();
+    toast("success", (makeStarred ? "Starred " : "Unstarred ") + fullName);
+    logActivity("success", (makeStarred ? "Starred " : "Removed star from ") + fullName);
+  }catch(err){
+    if(err.isPermission){
+      repo._starPermIssue = true;
+      toast("error", "Your token doesn't have permission to star repos. Use a classic PAT with the 'user' scope.");
+    } else {
+      toast("error", err.message);
+    }
+    logActivity("error", "Failed to " + (makeStarred ? "star " : "unstar ") + fullName + ": " + err.message);
+  }finally{
+    btns.forEach(b => paintStarButton(b, repo.viewer_has_starred, repo));
+  }
+}
+
+async function copyRepoLink(fullName){
+  const repo = state.repos.find(r => r.full_name === fullName);
+  if(!repo) return;
+  try{
+    await navigator.clipboard.writeText(repo.html_url);
+    toast("success", "Repo link copied to clipboard.");
+  }catch(e){
+    toast("info", repo.html_url);
+  }
+}
+
+function toggleRepoVisibility(fullName){
+  const repo = state.repos.find(r => r.full_name === fullName);
+  if(!repo) return;
+  const makePrivate = !repo.private;
+  const pagesWarning = (makePrivate && repo.has_pages) ?
+    ' Note: this repo has GitHub Pages enabled. On the free plan, Pages only serves public repos, so its live site will stop working until you either make it public again or upgrade to GitHub Pro/Team/Enterprise.' : '';
+  openConfirmModal({
+    heading: makePrivate ? "Make repository private" : "Make repository public",
+    body: 'This will change the visibility of "' + fullName + '" to ' + (makePrivate ? "private" : "public") + ' on GitHub.' + pagesWarning,
+    onConfirm: async () => {
+      try{
+        const updated = await ghFetch("/repos/" + fullName, { method: "PATCH", headers:{"Content-Type":"application/json"}, body: JSON.stringify({ private: makePrivate }) });
+        repo.private = updated.private;
+        updateStats();
+        renderRepoList();
+        renderRecentRepos();
+        toast("success", fullName + " is now " + (updated.private ? "private" : "public") + ".");
+        logActivity("success", "Changed visibility of " + fullName + " to " + (updated.private ? "private" : "public"));
+        if(state.manageRepo && state.manageRepo.full_name === fullName){
+          state.manageRepo.private = updated.private;
+          renderManageVisibility();
+        }
+      }catch(err){
+        toast("error", err.message);
+        logActivity("error", "Failed to change visibility of " + fullName + ": " + err.message);
+      }
+    }
   });
 }
 
@@ -1635,6 +2003,352 @@ function confirmDeleteRepo(fullName){
       }catch(err){
         toast("error", err.message);
         logActivity("error", "Failed to delete " + fullName + ": " + err.message);
+      }
+    }
+  });
+}
+
+/* ===================== Manage Repo (file browser / editor) ===================== */
+let promptCallback = null;
+function openPromptModal({heading, body, value, onConfirm}){
+  $("#promptModalHeading").textContent = heading;
+  const bodyEl = $("#promptModalBody");
+  if(body){ bodyEl.textContent = body; bodyEl.style.display = "block"; } else { bodyEl.style.display = "none"; }
+  $("#promptModalInput").value = value || "";
+  promptCallback = onConfirm;
+  $("#promptModalBackdrop").classList.add("show");
+  setTimeout(() => $("#promptModalInput").focus(), 30);
+}
+function closePromptModal(){
+  $("#promptModalBackdrop").classList.remove("show");
+  promptCallback = null;
+}
+
+function textFileExt(path){
+  const m = /\.([a-zA-Z0-9]+)$/.exec(path || "");
+  return m ? m[1].toLowerCase() : "";
+}
+const BINARY_EXT = ["png","jpg","jpeg","gif","webp","ico","bmp","pdf","zip","gz","tar","woff","woff2","ttf","eot","mp4","mp3","mov","otf","exe","dll","so","class","jar","7z","rar"];
+function fileIconFor(path){
+  const ext = textFileExt(path);
+  if(BINARY_EXT.includes(ext)) return "fa-file";
+  if(["js","ts","jsx","tsx","py","java","go","rb","php","c","cpp","cs","rs","json","yml","yaml","html","css","scss","sh"].includes(ext)) return "fa-file-code";
+  return "fa-file-lines";
+}
+
+async function openManageRepoModal(fullName){
+  const repo = state.repos.find(r => r.full_name === fullName);
+  if(!repo) return;
+  state.manageRepo = repo;
+  state.manageBranch = repo.default_branch || "main";
+  state.manageCurrentFile = null;
+  state.manageDirty = false;
+  $("#manageRepoName").textContent = fullName;
+  $("#manageRepoBackdrop").classList.add("show");
+  $("#manageEditorEmpty").style.display = "flex";
+  $("#manageEditorWrap").style.display = "none";
+  renderManageVisibility();
+  await populateManageBranches();
+  await loadManageTree();
+  await refreshManagePagesPanel();
+}
+async function refreshManagePagesPanel(){
+  const repo = state.manageRepo;
+  if(!repo) return;
+  const statusEl = $("#managePagesStatus");
+  statusEl.textContent = "Checking Pages status…";
+  const branchSel = $("#managePagesBranch");
+  const srcSel = $("#manageBranchSelect");
+  branchSel.innerHTML = srcSel.innerHTML || ('<option value="' + escapeHtml(repo.default_branch || "main") + '">' + escapeHtml(repo.default_branch || "main") + '</option>');
+  const info = await fetchPagesInfo(repo.full_name);
+  statusEl.innerHTML = pagesStatusHtml(info);
+  if(info.enabled && info.data.source){
+    if([...branchSel.options].some(o => o.value === info.data.source.branch)) branchSel.value = info.data.source.branch;
+    $("#managePagesPath").value = info.data.source.path || "/";
+  } else {
+    branchSel.value = repo.default_branch || branchSel.value;
+  }
+  repo.has_pages = !!info.enabled;
+  repo._pagesUrl = info.enabled ? info.data.html_url : null;
+}
+function closeManageRepoModal(){
+  if(state.manageDirty && !confirm("You have unsaved changes to this file. Close without saving?")) return;
+  $("#manageRepoBackdrop").classList.remove("show");
+  state.manageRepo = null;
+}
+function renderManageVisibility(){
+  const repo = state.manageRepo;
+  if(!repo) return;
+  $("#managePublicCheck").checked = !repo.private;
+  $("#manageVisLabel").textContent = repo.private ? "Private" : "Public";
+  $("#manageVisIcon").innerHTML = '<i class="fa-solid fa-' + (repo.private ? 'lock' : 'lock-open') + '"></i>';
+  const linkBox = $("#manageLinkBox");
+  if(!repo.private){
+    linkBox.style.display = "flex";
+    $("#manageLinkInput").value = repo.html_url;
+    $("#manageLinkOpenBtn").href = repo.html_url;
+  } else {
+    linkBox.style.display = "none";
+  }
+}
+async function populateManageBranches(){
+  const sel = $("#manageBranchSelect");
+  sel.innerHTML = '<option>Loading…</option>';
+  try{
+    const branches = await ghFetch("/repos/" + state.manageRepo.full_name + "/branches?per_page=100");
+    sel.innerHTML = branches.map(b => '<option value="' + escapeHtml(b.name) + '">' + escapeHtml(b.name) + '</option>').join("");
+    sel.value = state.manageBranch;
+    if(!sel.value && branches.length) { sel.value = branches[0].name; state.manageBranch = branches[0].name; }
+  }catch(err){
+    sel.innerHTML = '<option value="' + escapeHtml(state.manageBranch) + '">' + escapeHtml(state.manageBranch) + '</option>';
+  }
+}
+async function loadManageTree(){
+  const treeEl = $("#manageTree");
+  treeEl.innerHTML = '<div class="empty-state"><span class="spinner"></span><span>Loading files…</span></div>';
+  try{
+    const branchInfo = await ghFetch("/repos/" + state.manageRepo.full_name + "/branches/" + encodeURIComponent(state.manageBranch));
+    const treeSha = branchInfo.commit.sha;
+    const data = await ghFetch("/repos/" + state.manageRepo.full_name + "/git/trees/" + treeSha + "?recursive=1");
+    state.manageTree = (data.tree || []).filter(n => n.type === "blob" || n.type === "tree");
+    renderManageTree();
+  }catch(err){
+    treeEl.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><span>' + escapeHtml(err.message) + '</span></div>';
+  }
+}
+function buildTreeStructure(flat){
+  const root = { name: "", path: "", type: "tree", children: {} };
+  flat.forEach(node => {
+    const parts = node.path.split("/");
+    let cur = root;
+    parts.forEach((part, i) => {
+      const isLast = i === parts.length - 1;
+      if(!cur.children[part]){
+        cur.children[part] = { name: part, path: parts.slice(0,i+1).join("/"), type: isLast ? node.type : "tree", children: {}, sha: isLast ? node.sha : undefined, size: isLast ? node.size : undefined };
+      }
+      cur = cur.children[part];
+    });
+  });
+  return root;
+}
+function renderTreeNode(node, depth){
+  const childrenArr = Object.values(node.children).sort((a,b) => {
+    if(a.type !== b.type) return a.type === "tree" ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+  return childrenArr.map(child => {
+    if(child.type === "tree"){
+      return '<div>' +
+        '<div class="tree-node-row"><div class="tree-node" data-dir-toggle="' + escapeHtml(child.path) + '" style="flex:1;">' +
+          '<i class="fa-solid fa-folder"></i> ' + escapeHtml(child.name) +
+        '</div></div>' +
+        '<div class="tree-children" data-dir-children="' + escapeHtml(child.path) + '">' + renderTreeNode(child, depth+1) + '</div>' +
+      '</div>';
+    }
+    return '<div class="tree-node-row">' +
+      '<div class="tree-node" data-file-path="' + escapeHtml(child.path) + '" style="flex:1;">' +
+        '<i class="fa-solid ' + fileIconFor(child.path) + '"></i> ' + escapeHtml(child.name) +
+      '</div>' +
+      '<div class="tree-node-actions">' +
+        '<button data-tree-rename="' + escapeHtml(child.path) + '" title="Rename"><i class="fa-solid fa-pen"></i></button>' +
+        '<button data-tree-delete="' + escapeHtml(child.path) + '" title="Delete"><i class="fa-solid fa-trash"></i></button>' +
+      '</div>' +
+    '</div>';
+  }).join("");
+}
+function renderManageTree(){
+  const structure = buildTreeStructure(state.manageTree || []);
+  state.manageTreeMap = structure;
+  const treeEl = $("#manageTree");
+  if(!state.manageTree || !state.manageTree.length){
+    treeEl.innerHTML = '<div class="empty-state"><i class="fa-regular fa-folder-open"></i><span>This branch has no files yet.</span></div>';
+    return;
+  }
+  treeEl.innerHTML = renderTreeNode(structure, 0);
+  bindManageTreeEvents();
+}
+function bindManageTreeEvents(){
+  const treeEl = $("#manageTree");
+  $all("[data-dir-toggle]", treeEl).forEach(el => {
+    el.addEventListener("click", () => {
+      el.querySelector("i").classList.toggle("fa-folder");
+      el.querySelector("i").classList.toggle("fa-folder-open");
+      const kids = $('[data-dir-children="' + CSS.escape(el.dataset.dirToggle) + '"]', treeEl);
+      if(kids) kids.style.display = kids.style.display === "none" ? "block" : "none";
+    });
+  });
+  $all("[data-file-path]", treeEl).forEach(el => {
+    el.addEventListener("click", () => openManageFile(el.dataset.filePath));
+  });
+  $all("[data-tree-rename]", treeEl).forEach(btn => {
+    btn.addEventListener("click", (e) => { e.stopPropagation(); renameManageFile(btn.dataset.treeRename); });
+  });
+  $all("[data-tree-delete]", treeEl).forEach(btn => {
+    btn.addEventListener("click", (e) => { e.stopPropagation(); deleteManageFile(btn.dataset.treeDelete); });
+  });
+}
+function markTreeActive(path){
+  $all(".tree-node", $("#manageTree")).forEach(el => el.classList.toggle("active", el.dataset.filePath === path));
+}
+async function openManageFile(path){
+  if(state.manageDirty && !confirm("Discard unsaved changes to the current file?")) return;
+  markTreeActive(path);
+  $("#manageEditorEmpty").innerHTML = '<span class="spinner"></span><span>Loading ' + escapeHtml(path) + '…</span>';
+  $("#manageEditorEmpty").style.display = "flex";
+  $("#manageEditorWrap").style.display = "none";
+  try{
+    const data = await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + path.split("/").map(encodeURIComponent).join("/") + "?ref=" + encodeURIComponent(state.manageBranch));
+    const ext = textFileExt(path);
+    if(BINARY_EXT.includes(ext)){
+      toast("info", "This file looks binary and can't be edited as text here. Use Replace file instead.");
+    }
+    let content = "";
+    try{ content = decodeURIComponent(escape(atob((data.content||"").replace(/\n/g,"")))); }
+    catch(e){ try{ content = atob((data.content||"").replace(/\n/g,"")); }catch(e2){ content = ""; } }
+    state.manageCurrentFile = { path, sha: data.sha, originalContent: content };
+    state.manageDirty = false;
+    $("#manageEditorEmpty").style.display = "none";
+    $("#manageEditorWrap").style.display = "flex";
+    $("#manageEditorFileName").textContent = path.split("/").pop();
+    $("#manageEditorFilePath").textContent = path;
+    $("#manageFileEditor").value = content;
+    $("#manageStatus").textContent = "";
+  }catch(err){
+    $("#manageEditorEmpty").innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i><span>' + escapeHtml(err.message) + '</span>';
+    $("#manageEditorEmpty").style.display = "flex";
+    $("#manageEditorWrap").style.display = "none";
+  }
+}
+function utf8ToBase64(str){
+  return btoa(unescape(encodeURIComponent(str)));
+}
+async function saveManageFile(){
+  const f = state.manageCurrentFile;
+  if(!f) return;
+  const content = $("#manageFileEditor").value;
+  $("#manageStatus").innerHTML = '<span class="spinner"></span> Saving…';
+  try{
+    const body = {
+      message: "Update " + f.path + " via GitPilot",
+      content: utf8ToBase64(content),
+      sha: f.sha,
+      branch: state.manageBranch
+    };
+    const res = await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + f.path.split("/").map(encodeURIComponent).join("/"), {
+      method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body)
+    });
+    f.sha = res.content.sha;
+    f.originalContent = content;
+    state.manageDirty = false;
+    $("#manageStatus").textContent = "Saved just now.";
+    toast("success", "Saved " + f.path);
+    logActivity("success", "Updated " + f.path + " in " + state.manageRepo.full_name);
+  }catch(err){
+    $("#manageStatus").textContent = "";
+    toast("error", err.message);
+    logActivity("error", "Failed to save " + f.path + ": " + err.message);
+  }
+}
+function renameManageFile(path){
+  openPromptModal({
+    heading: "Rename / move file",
+    body: 'New path for "' + path + '" (include folders to move it):',
+    value: path,
+    onConfirm: async (newPath) => {
+      newPath = (newPath || "").trim().replace(/^\/+/, "");
+      if(!newPath || newPath === path) return;
+      await renameOrReplaceFile(path, newPath);
+    }
+  });
+}
+async function renameOrReplaceFile(oldPath, newPath){
+  try{
+    const data = await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + oldPath.split("/").map(encodeURIComponent).join("/") + "?ref=" + encodeURIComponent(state.manageBranch));
+    await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + newPath.split("/").map(encodeURIComponent).join("/"), {
+      method: "PUT", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "Rename " + oldPath + " to " + newPath + " via GitPilot", content: data.content.replace(/\n/g,""), branch: state.manageBranch })
+    });
+    await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + oldPath.split("/").map(encodeURIComponent).join("/"), {
+      method: "DELETE", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "Remove old path " + oldPath + " after rename via GitPilot", sha: data.sha, branch: state.manageBranch })
+    });
+    toast("success", "Renamed " + oldPath + " to " + newPath);
+    logActivity("success", "Renamed " + oldPath + " to " + newPath + " in " + state.manageRepo.full_name);
+    if(state.manageCurrentFile && state.manageCurrentFile.path === oldPath){
+      state.manageCurrentFile = null;
+      $("#manageEditorWrap").style.display = "none";
+      $("#manageEditorEmpty").style.display = "flex";
+    }
+    await loadManageTree();
+  }catch(err){
+    toast("error", err.message);
+    logActivity("error", "Rename failed for " + oldPath + ": " + err.message);
+  }
+}
+function deleteManageFile(path){
+  openConfirmModal({
+    heading: "Delete file",
+    body: 'Delete "' + path + '" from ' + state.manageRepo.full_name + '? This cannot be undone.',
+    onConfirm: async () => {
+      try{
+        const data = await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + path.split("/").map(encodeURIComponent).join("/") + "?ref=" + encodeURIComponent(state.manageBranch));
+        await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + path.split("/").map(encodeURIComponent).join("/"), {
+          method: "DELETE", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: "Delete " + path + " via GitPilot", sha: data.sha, branch: state.manageBranch })
+        });
+        toast("success", "Deleted " + path);
+        logActivity("success", "Deleted " + path + " from " + state.manageRepo.full_name);
+        if(state.manageCurrentFile && state.manageCurrentFile.path === path){
+          state.manageCurrentFile = null;
+          $("#manageEditorWrap").style.display = "none";
+          $("#manageEditorEmpty").style.display = "flex";
+        }
+        await loadManageTree();
+      }catch(err){
+        toast("error", err.message);
+        logActivity("error", "Failed to delete " + path + ": " + err.message);
+      }
+    }
+  });
+}
+async function replaceManageFileContents(fileBlob){
+  const f = state.manageCurrentFile;
+  if(!f) return;
+  try{
+    const buf = await fileBlob.arrayBuffer();
+    const b64 = arrayBufferToBase64(buf);
+    const res = await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + f.path.split("/").map(encodeURIComponent).join("/"), {
+      method: "PUT", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: "Replace " + f.path + " via GitPilot", content: b64, sha: f.sha, branch: state.manageBranch })
+    });
+    f.sha = res.content.sha;
+    toast("success", "Replaced " + f.path);
+    logActivity("success", "Replaced " + f.path + " in " + state.manageRepo.full_name);
+    openManageFile(f.path);
+  }catch(err){
+    toast("error", err.message);
+    logActivity("error", "Failed to replace " + f.path + ": " + err.message);
+  }
+}
+function newManageFile(){
+  openPromptModal({
+    heading: "New file",
+    body: "Path for the new file (e.g. src/notes.md):",
+    value: "",
+    onConfirm: async (path) => {
+      path = (path || "").trim().replace(/^\/+/, "");
+      if(!path) return;
+      try{
+        await ghFetch("/repos/" + state.manageRepo.full_name + "/contents/" + path.split("/").map(encodeURIComponent).join("/"), {
+          method: "PUT", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: "Create " + path + " via GitPilot", content: utf8ToBase64(""), branch: state.manageBranch })
+        });
+        toast("success", "Created " + path);
+        logActivity("success", "Created " + path + " in " + state.manageRepo.full_name);
+        await loadManageTree();
+        openManageFile(path);
+      }catch(err){
+        toast("error", err.message);
       }
     }
   });
@@ -2124,21 +2838,45 @@ async function deleteRepoSecret(fullName, name){
     }
   });
 }
+async function fetchPagesInfo(fullName){
+  // Returns {enabled:true, data} | {enabled:false, reason:"none"|"private"|"error", message}
+  try{
+    const data = await ghFetch("/repos/" + fullName + "/pages");
+    return { enabled: true, data };
+  }catch(err){
+    if(err.status === 404){
+      return { enabled: false, reason: "none", message: "GitHub Pages is not yet set up for this repository." };
+    }
+    const repo = state.repos.find(r => r.full_name === fullName);
+    if(repo && repo.private && (err.status === 403 || err.status === 402 || err.status === 422)){
+      return { enabled: false, reason: "private-plan", message: "GitHub Pages for a private repository needs GitHub Pro, Team or Enterprise. On a free plan, make the repo public first, or enable Pages on a public repo." };
+    }
+    return { enabled: false, reason: "error", message: err.message };
+  }
+}
+function pagesStatusHtml(info){
+  if(info.enabled){
+    const branch = info.data.source ? info.data.source.branch : "?";
+    const path = info.data.source && info.data.source.path && info.data.source.path !== "/" ? (" (" + info.data.source.path + ")") : "";
+    const building = info.data.status === "building";
+    return '<span class="badge badge-success">Enabled</span> ' + (building ? '<span class="badge badge-warning">Building…</span> ' : '') +
+      'Live at <a href="' + info.data.html_url + '" target="_blank" rel="noopener">' + escapeHtml(info.data.html_url) + '</a> &middot; source: <strong>' + escapeHtml(branch) + escapeHtml(path) + '</strong>';
+  }
+  if(info.reason === "private-plan"){
+    return '<span class="badge badge-danger">Blocked</span> ' + escapeHtml(info.message);
+  }
+  if(info.reason === "none"){
+    return '<span class="badge badge-warning">Not enabled</span> ' + escapeHtml(info.message) + ' Source is currently set to <strong>None</strong>. Pick a branch below and click Enable.';
+  }
+  return '<span class="badge badge-danger">Error</span> ' + escapeHtml(info.message);
+}
 async function loadPagesStatus(){
   const fullName = $("#secRepoSelect").value;
   const box = $("#pagesStatusBox");
   if(!fullName){ box.textContent = "Select a repository to view its Pages configuration."; return; }
   box.innerHTML = '<span class="spinner"></span> Checking Pages status…';
-  try{
-    const data = await ghFetch("/repos/" + fullName + "/pages");
-    box.innerHTML = '<span class="badge badge-success">Enabled</span> Live at <a href="' + data.html_url + '" target="_blank" rel="noopener">' + escapeHtml(data.html_url) + '</a> &middot; building from <strong>' + escapeHtml(data.source ? data.source.branch : "?") + (data.source && data.source.path && data.source.path !== "/" ? (" (" + data.source.path + ")") : "") + '</strong>';
-  }catch(err){
-    if(err.status === 404){
-      box.innerHTML = '<span class="badge badge-warning">Not enabled</span> GitHub Pages is not yet set up for this repository.';
-    } else {
-      box.innerHTML = '<span class="badge badge-danger">Error</span> ' + escapeHtml(err.message);
-    }
-  }
+  const info = await fetchPagesInfo(fullName);
+  box.innerHTML = pagesStatusHtml(info);
 }
 async function enableOrUpdatePages(){
   const fullName = $("#secRepoSelect").value;
@@ -2146,14 +2884,18 @@ async function enableOrUpdatePages(){
   const path = $("#pagesPath").value || "/";
   const statusEl = $("#pagesStatus");
   if(!fullName){ toast("error","Select a repository first."); return; }
+  await enableOrUpdatePagesFor(fullName, branch, path, statusEl, loadPagesStatus);
+}
+async function enableOrUpdatePagesFor(fullName, branch, path, statusEl, afterRefresh){
   statusEl.innerHTML = '<span class="spinner"></span> Saving…';
+  const existing = await fetchPagesInfo(fullName);
   try{
-    try{
+    if(existing.enabled){
       await ghFetch("/repos/" + fullName + "/pages", {
         method:"PUT", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({ source: { branch, path } })
       });
-    }catch(e){
+    } else {
       await ghFetch("/repos/" + fullName + "/pages", {
         method:"POST", headers:{"Content-Type":"application/json"},
         body: JSON.stringify({ source: { branch, path } })
@@ -2162,10 +2904,18 @@ async function enableOrUpdatePages(){
     statusEl.textContent = "Pages configuration saved.";
     toast("success", "GitHub Pages updated for " + fullName);
     logActivity("success", "Updated GitHub Pages for " + fullName);
-    loadPagesStatus();
+    const repo = state.repos.find(r => r.full_name === fullName);
+    if(repo) repo.has_pages = true;
+    if(afterRefresh) afterRefresh();
   }catch(err){
     statusEl.textContent = "";
-    toast("error", err.message);
+    const repo = state.repos.find(r => r.full_name === fullName);
+    if(repo && repo.private && (err.status === 403 || err.status === 402 || err.status === 422)){
+      toast("error", "GitHub Pages for a private repo needs GitHub Pro/Team/Enterprise. Make the repo public first, then enable Pages.");
+    } else {
+      toast("error", err.message);
+    }
+    if(afterRefresh) afterRefresh();
   }
 }
 
@@ -2260,7 +3010,7 @@ function closeConfirmModal(){
 /* ===================== Init / Event bindings ===================== */
 /* ===================== Copilot (OpenRouter chat) ===================== */
 const copilotState = {
-  settings: { apiKey:"", model:"openai/gpt-4o-mini", customModel:"", rules:"", temperature:0.7 },
+  settings: { apiKey:"", model:"openai/gpt-4o-mini", customModel:"", rules:"", temperature:0.5 },
   messages: [], // {role:"user"|"assistant", content}
   sending: false
 };
@@ -2297,7 +3047,7 @@ function applyCopilotSettingsToForm(){
     $("#copilotCustomModel").value = s.model;
   }
   $("#copilotRules").value = s.rules || $("#copilotRules").value;
-  $("#copilotTemperature").value = (s.temperature !== undefined && s.temperature !== null) ? s.temperature : 0.7;
+  $("#copilotTemperature").value = (s.temperature !== undefined && s.temperature !== null) ? s.temperature : 0.5;
   $("#copilotTempValue").textContent = $("#copilotTemperature").value;
   updateCopilotStatusLine();
 }
@@ -2397,7 +3147,7 @@ async function sendCopilotMessage(){
       body: JSON.stringify({
         model: model,
         messages: payloadMessages,
-        temperature: parseFloat(copilotState.settings.temperature !== undefined ? copilotState.settings.temperature : 0.7)
+        temperature: parseFloat(copilotState.settings.temperature !== undefined ? copilotState.settings.temperature : 0.5)
       })
     });
     const data = await resp.json();
@@ -2490,6 +3240,8 @@ function init(){
     } else if(!setupSeen){
       $("#setupModalBackdrop").classList.add("show");
     }
+    const draftFine = localStorage.getItem(STORAGE_DRAFT_FINE_KEY);
+    if(draftFine && !(persisted === "1" && savedToken)){ $("#patInput").value = draftFine; }
   }catch(e){}
 
   // Nav
@@ -2511,6 +3263,72 @@ function init(){
   $("#mobileBackdrop").addEventListener("click", closeMobileSidebar);
 
   // Connection
+  let selectedTokenKind = "fine-grained";
+  const tokenDrafts = { "fine-grained": "", "classic": "" };
+  try{
+    tokenDrafts["fine-grained"] = localStorage.getItem(STORAGE_DRAFT_FINE_KEY) || "";
+    tokenDrafts["classic"] = localStorage.getItem(STORAGE_DRAFT_CLASSIC_KEY) || "";
+  }catch(e){}
+  function saveTokenDraft(kind, value){
+    tokenDrafts[kind] = value;
+    const key = kind === "classic" ? STORAGE_DRAFT_CLASSIC_KEY : STORAGE_DRAFT_FINE_KEY;
+    try{
+      if(value){ localStorage.setItem(key, value); }
+      else { localStorage.removeItem(key); }
+    }catch(e){}
+  }
+  const TOKEN_KIND_INFO = {
+    "fine-grained": {
+      url: "https://github.com/settings/tokens?type=beta",
+      placeholder: "github_pat_xxxxxxxxxxxxxxxxxxxx",
+      hint: 'Use a <strong>fine-grained personal access token</strong> with repo access, plus the permissions for any features you want (Actions, Pull requests, Issues, Secrets, Pages, Security events, Administration, etc). <a href="https://github.com/settings/tokens?type=beta" target="_blank" rel="noopener" id="createTokenLink">Create a token on GitHub &rarr;</a>',
+      toastTip: "Generate a fine-grained PAT there, then paste it above."
+    },
+    "classic": {
+      url: "https://github.com/settings/tokens/new",
+      placeholder: "ghp_xxxxxxxxxxxxxxxxxxxx",
+      hint: 'Use a <strong>classic personal access token</strong> with the <code>repo</code> scope, plus <code>workflow</code>, <code>user</code> or <code>admin:repo_hook</code> for any extra features you want. <a href="https://github.com/settings/tokens/new" target="_blank" rel="noopener" id="createTokenLink">Create a token on GitHub &rarr;</a>',
+      toastTip: "Generate a classic PAT there, then paste it above."
+    }
+  };
+  function setTokenKind(kind, opts){
+    opts = opts || {};
+    if(!opts.skipSaveCurrent){
+      saveTokenDraft(selectedTokenKind, $("#patInput").value.trim());
+    }
+    selectedTokenKind = kind;
+    const isFine = kind === "fine-grained";
+    $("#tokenTypeFineBtn").classList.toggle("active", isFine);
+    $("#tokenTypeFineBtn").setAttribute("aria-selected", String(isFine));
+    $("#tokenTypeClassicBtn").classList.toggle("active", !isFine);
+    $("#tokenTypeClassicBtn").setAttribute("aria-selected", String(!isFine));
+    $("#tokenPanelFine").classList.toggle("active", isFine);
+    $("#tokenPanelClassic").classList.toggle("active", !isFine);
+    const info = TOKEN_KIND_INFO[kind];
+    $("#patInputHint").innerHTML = info.hint;
+    $("#patInput").placeholder = info.placeholder;
+    $("#patInput").value = tokenDrafts[kind] || "";
+  }
+  $("#tokenTypeFineBtn").addEventListener("click", () => setTokenKind("fine-grained"));
+  $("#tokenTypeClassicBtn").addEventListener("click", () => setTokenKind("classic"));
+  function switchConnectedTokenKind(kind){
+    state.token = null;
+    state.user = null;
+    state.repos = [];
+    state.reposLoaded = false;
+    state.tokenScopes = [];
+    state.tokenType = null;
+    try{
+      localStorage.removeItem(STORAGE_TOKEN_KEY);
+      localStorage.removeItem(STORAGE_PERSIST_KEY);
+    }catch(e){}
+    renderDisconnectedUI();
+    setTokenKind(kind);
+    toast("info", "Switched to " + (kind === "classic" ? "classic" : "fine-grained") + ". Paste or confirm the token below, then connect.");
+  }
+  $("#switchToFineBtn").addEventListener("click", () => switchConnectedTokenKind("fine-grained"));
+  $("#switchToClassicBtn").addEventListener("click", () => switchConnectedTokenKind("classic"));
+  $("#patInput").addEventListener("input", () => { saveTokenDraft(selectedTokenKind, $("#patInput").value.trim()); });
   $("#togglePatBtn").addEventListener("click", () => {
     const input = $("#patInput");
     const icon = $("#togglePatBtn i");
@@ -2529,8 +3347,9 @@ function init(){
     $("#patInput").value = token;
   });
   $("#openTokenSettingsBtn").addEventListener("click", () => {
-    window.open("https://github.com/settings/tokens?type=beta", "_blank", "noopener");
-    toast("success", "Opened GitHub token settings in a new tab. Generate a fine-grained PAT there, then paste it above.");
+    const info = TOKEN_KIND_INFO[selectedTokenKind];
+    window.open(info.url, "_blank", "noopener");
+    toast("success", "Opened GitHub token settings in a new tab. " + info.toastTip);
   });
 
   // One-time setup modal
@@ -2670,7 +3489,62 @@ function init(){
     if(cb) await cb();
   });
   $("#confirmModalBackdrop").addEventListener("click", (e) => { if(e.target.id === "confirmModalBackdrop") closeConfirmModal(); });
-  document.addEventListener("keydown", (e) => { if(e.key === "Escape") closeConfirmModal(); });
+  document.addEventListener("keydown", (e) => { if(e.key === "Escape"){ closeConfirmModal(); closePromptModal(); } });
+
+  // Prompt modal
+  $("#promptCancelBtn").addEventListener("click", closePromptModal);
+  $("#promptOkBtn").addEventListener("click", async () => {
+    const cb = promptCallback;
+    const val = $("#promptModalInput").value;
+    closePromptModal();
+    if(cb) await cb(val);
+  });
+  $("#promptModalInput").addEventListener("keydown", (e) => { if(e.key === "Enter") $("#promptOkBtn").click(); });
+  $("#promptModalBackdrop").addEventListener("click", (e) => { if(e.target.id === "promptModalBackdrop") closePromptModal(); });
+
+  // Manage Repo modal
+  $("#manageRepoCloseBtn").addEventListener("click", closeManageRepoModal);
+  $("#manageRepoBackdrop").addEventListener("click", (e) => { if(e.target.id === "manageRepoBackdrop") closeManageRepoModal(); });
+  $("#manageBranchSelect").addEventListener("change", async (e) => {
+    state.manageBranch = e.target.value;
+    state.manageCurrentFile = null;
+    $("#manageEditorWrap").style.display = "none";
+    $("#manageEditorEmpty").style.display = "flex";
+    await loadManageTree();
+  });
+  $("#manageRefreshTreeBtn").addEventListener("click", loadManageTree);
+  $("#manageNewFileBtn").addEventListener("click", newManageFile);
+  $("#manageSaveBtn").addEventListener("click", saveManageFile);
+  $("#manageRenameBtn").addEventListener("click", () => { if(state.manageCurrentFile) renameManageFile(state.manageCurrentFile.path); });
+  $("#manageDeleteFileBtn").addEventListener("click", () => { if(state.manageCurrentFile) deleteManageFile(state.manageCurrentFile.path); });
+  $("#manageReplaceInput").addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
+    if(file) replaceManageFileContents(file);
+    e.target.value = "";
+  });
+  $("#manageFileEditor").addEventListener("input", () => { state.manageDirty = true; $("#manageStatus").textContent = "Unsaved changes."; });
+  $("#managePublicCheck").addEventListener("change", (e) => {
+    const repo = state.manageRepo;
+    if(!repo) return;
+    e.target.checked = !repo.private; // revert until confirmed
+    toggleRepoVisibilityFromModal(repo.full_name, !repo.private);
+  });
+  $("#manageLinkCopyBtn").addEventListener("click", async () => {
+    const val = $("#manageLinkInput").value;
+    try{ await navigator.clipboard.writeText(val); toast("success","Link copied."); }catch(e){ toast("info", val); }
+  });
+  $("#managePagesEnableBtn").addEventListener("click", async () => {
+    const repo = state.manageRepo;
+    if(!repo) return;
+    const branch = $("#managePagesBranch").value || repo.default_branch || "main";
+    const path = $("#managePagesPath").value || "/";
+    await enableOrUpdatePagesFor(repo.full_name, branch, path, $("#managePagesSaveStatus"), refreshManagePagesPanel);
+    renderRepoList();
+  });
+}
+
+function toggleRepoVisibilityFromModal(fullName, makePrivateIgnored){
+  toggleRepoVisibility(fullName);
 }
 
 document.addEventListener("DOMContentLoaded", init);
